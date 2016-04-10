@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+<script  src="./lib/jquery.min.js"></script>
+<script src="./lib/jquery-ui.js"></script>
+<link rel="stylesheet" href="./lib/bootstrap.min.css">
+<link rel="stylesheet" href="./lib/bootstrap-theme.min.css">
+<script  src="./lib/bootstrap.min.js"></script>
+<script  src="./lib/angular.min.js"></script>
+<script  src="./lib/angucomplete-alt.js"></script>
+<!-- Loading the AngularJS file from /public/angularJS folder -->
+<script src="./angularjs/login.js"></script>
+<script src="./angularjs/userModule.js"></script>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<title>Welcome</title>
+</head>
+
+<body ng-app="userModule" ng-controller="userController">
+	<script type="text/javascript"> 
+		x = '<%= userid %>';
+	
+ 	</script> 
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Twitter</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+      	<li>			
+				<input class="form-control" style="margin-top: 8.5px" type="" ng-model="searchkey" ng-keypress="search()" placeholder="search"></input>
+			</li>
+	      <li><a data-toggle="modal" href="#myTweet"><i class="fa fa-twitter"></i>  Tweet</a></li>
+	      <li>
+	      	<form action="logout" method="post">
+							<input style="margin-top: 7.5px;" class="btn btn-default" type="submit" value="Logout"/>
+						</form>
+	      </li>
+
+     	</ul>
+     	</div> 
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+		  
+	<div class="col-md-3" ng-init="getuser(user_id); tweetCount(user_id); followingCount(user_id); followerCount(user_id); follow(user_id);">
+		
+		<div class="twPc-div">
+    		<a class="twPc-bg twPc-block"></a>
+
+			<div>
+            <!-- Twitter Button | you can get from: https://about.twitter.com/tr/resources/buttons#follow -->
+            
+			<a title="" href="" class="twPc-avatarLink">
+				<img alt="" src="https://g.twimg.com/about/feature-corporate/image/twitterbird_RGB.png" class="twPc-avatarImg">
+			</a>
+			</div>
+		<div class="twPc-divUser">
+			<div class="twPc-divName">
+				<a href="/user?userid={{userInfo.id}}">{{userInfo.first_name + " "+ userInfo.last_name}}</a>
+			</div>
+			<span>
+				<a href="/user?userid={{userInfo.id}}">@{{userInfo.username}}<span></span></a>
+			</span>
+		</div>
+
+		<div class="twPc-divStats">
+			<ul class="twPc-Arrange">
+				<li class="twPc-ArrangeSizeFit">
+					<a href="/user?userid={{userInfo.id}}" title="">
+						<span class="twPc-StatLabel twPc-block">Tweets</span>
+						<span class="twPc-StatValue">{{tweetCount}}</span>
+					</a>
+				</li>
+				<li class="twPc-ArrangeSizeFit">
+					<a data-toggle="modal" data-target=".bs-example-modal-sm" title="">
+						<span class="twPc-StatLabel twPc-block">Following</span>
+						<span class="twPc-StatValue">{{followingCount-1}}</span>
+					</a>
+				</li>
+				<li class="twPc-ArrangeSizeFit">
+					<a data-toggle="modal" data-target=".bs-example-modal-sm1" >
+						<span class="twPc-StatLabel twPc-block">Followers</span>
+						<span class="twPc-StatValue">{{followerCount-1}}</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+
+	</div>
+
+	<div  class="col-md-5">
+
+		<div style= "" ng-model="tweets">
+
+
+			<div class="" ng-repeat="tweet in tweets">
+				<div class="tweetStyle"> 
+					<span style="font-size: 20px; margin-bottom: 10px; padding-bottom: 10px;"> {{tweet.first_name + " " + tweet.last_name}} </span>
+						<small>@{{tweet.username}}	{{tweet.created_at | date : 'medium'}}</small>
+					<br>
+					<p style="font: 15px; margin-top:10px;"> <span ng-bind-html="toTrustedHTML(tweet.content)"> </span></p>
+					
+					
+					<i class="fa fa-retweet" data-toggle="modal" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i>
+
+				
+				</div>
+		  			<div class="tweetStyle" ng-repeat="retweet in retweets"> 
+				<i class="fa fa-retweet"></i><small>{{retweet.t2_first_name + " " + retweet.t2_last_name}} Retweeted </small> <br>
+				<span style="font-size: 20px; margin-bottom: 10px; padding-bottom: 10px;"> {{retweet.first_name + " " + retweet.last_name}} </span>
+				<small>@{{tweet.username}}	{{retweet.tweet_created_at | date : 'medium'}}</small>
+				<p style="font: 15px; margin-top:10px;" xml:lang="en" lang="en"><span ng-bind-html="toTrustedHTML(retweet.content)"> </span><br>
+				
+				<i class="fa fa-retweet" data-toggle="modal" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i>
+			</div>  
+
+
+			</div>
+		  </div>
+		</div>	
+		<div class="col-md-3">
+
+	</div>
+
+	<div class="col-md-2">
+			
+			<span style="margin-bottom: 10px;">Suggested Users</span>
+			<div style="border: 1px solid rgba(180, 173, 173, 0.56); padding: 5px;" ng-repeat="ruser in allusers">
+				 
+				 <a href="/user?userid={{ruser.id}}">{{ruser.first_name + " " + ruser.last_name}} <small>@{{ruser.username}} </small></a><br>
+				 <i  class="fa fa-plus" ng-click="follow(ruser.id);">  Follow </i>
+			</div>
+	</div>
+	<div class= "modal fade" id="retweet" tabindex="-1" role="dialog" aria-labelledby="Retweet">
+	  	<div class="modal-dialog modal-sm" >
+		 	<div class="modal-content">
+				<div class="modal-header">
+					  <h4 class="modal-title" id="gridSystemModalLabel">Retweet</h4>
+				</div>
+				<div class="modal-body tweetStyle" ng-init="retweet_hide=true;">
+					@<span  id="tweetusername"></span></br>
+					<span  id="tweetc"></span>
+					<input ng-model="retweet_id1" id="retweetid1" ng-hide="true"></input><br>
+					<span ng-hide="retweet_hide">Already retweeted</span>
+					</br>
+					<i class="fa fa-retweet" id="retweet_button" ng-click="retweet()" ></i>
+				</div>
+		 	</div>
+	  	</div>
+	</div>
+
+
+
+<div id="myTweet" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button>
+				<h4 class="modal-title">Tweet</h4>
+			</div>
+		<div class="modal-body">
+			<div class="row">
+				<input class="form-control" type="text" ng-model="tweetData" placeholder="What's Happening?">
+				</input>
+				<button class="Button" style = "float : right; margin: 10px" class="btn btn-primary" ng-click="postTweet();">Tweet</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="Following">
+  <div class="modal-dialog modal-sm">
+	 <div class="modal-content">
+		<div class="modal-header">
+			 <h4 class="modal-title" id="gridSystemModalLabel">Following</h4>
+		</div>
+		<div ng-model="followings" >
+		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="following in followings">
+			 {{following.first_name + " " + following.last_name}} : @{{following.username}} 
+		  </div>
+		</div>
+	 </div>
+  </div>
+</div>
+
+<div class="modal fade bs-example-modal-sm1" tabindex="-1" role="dialog" aria-labelledby="Follwers">
+  <div class="modal-dialog modal-sm">
+	 <div class="modal-content">
+		<div class="modal-header">
+			 <h4 class="modal-title" id="gridSystemModalLabel">Followers</h4>
+		</div>
+		<div ng-model="followers" >
+		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="follower in followers">
+			 {{follower.first_name + " " + follower.last_name}} : @{{follower.username}} 
+
+		  </div>
+		</div>
+	 </div>
+  </div>
+</div>
+
+
+	<table class="table table-striped searchTable">
+    	<tbody ng-repeat="us in userSearch">
+	      <tr>
+	        <td><a href="./user?userid={{us.id}}">{{us.first_name + "" + us.last_name}} @{{us.username}}</a></td>
+	      </tr>
+   	</tbody>
+	</table>
+
+<script type="text/javascript">
+		$('#retweet').on('show.bs.modal', function (event) {
+		  var button = $(event.relatedTarget) // Button that triggered the modal
+		  var tweetcontent = button.data('content') // Extract info from data-* attributes
+		  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+		  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+		  console.log(tweetcontent);
+		  var modal = $(this)
+		  modal.find('#tweetusername').text(tweetcontent.username)
+		  modal.find('#tweetc').text(tweetcontent.content)
+			modal.find('#retweetid1').val(tweetcontent.tweet_id)
+		})
+</script>
+
+</body>
+</html>

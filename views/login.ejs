@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= title %></title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<script	src="./lib/jquery.min.js"></script>
+<script src="./lib/jquery-ui.js"></script>
+<link rel="stylesheet" href="./lib/bootstrap.min.css">
+<link rel="stylesheet" href="./lib/bootstrap-theme.min.css">
+<script	src="./lib/bootstrap.min.js"></script>
+<script	src="./lib/angular.min.js"></script>
+<script  src="./lib/angucomplete-alt.js"></script>
+
+<!-- Loading the AngularJS file from /public/angularJS folder -->
+<script src="./angularjs/login.js"></script>
+
+<script type="text/javascript"> 
+</script>
+</head>
+<body ng-app="loginModule" ng-controller="loginController">
+
+
+	<div class="backgroundImage">
+     
+      <div class="buttonContainer">
+      	<p style="float: left; color: rgb(255, 255, 255); font-size: 35px;">Twitter</p>   
+      	<a data-toggle="modal" href="#mySignUp" class="Button SignUp">Sign Up</a>
+      </div>
+    </div>    
+
+    
+	<div class="col-sm-3"></div>
+
+	<div  class="col-sm-6">	
+		<div class="panel" style="background-color: #1da1f2; margin-top: 20px;">
+	        <div class="panel-body">
+	        	<h3 style="margin: 10px; color: rgb(255,255,255);">Login to your account</h3>
+				<div class="col-sm-8" style="margin: 10px">
+				      <input class="inputStyle" type="text" class="form-control" name="Username" ng-model="username" placeholder="Username" required>
+				</div>
+				<div class="col-sm-8" style="margin: 10px">
+					  <input class="inputStyle" type="password" class="form-control" name="Password" ng-model="password" placeholder="Password" required>
+				</div>
+				
+				<div class="col-md-8" style="margin: 10px;">
+					<div ng-hide="invalid_login" class="alert alert-danger ng-hide" >
+						<strong>Incorrect username or password</strong>
+					</div>
+					<div ng-hide="unexpected_error" class="alert alert-danger ng-hide" >
+						<strong>Unexpected error, try again</strong>
+					</div>
+					<input class="buttonStyle" type="submit" class="btn primary-btn" ng-click="submitLogin();" value="Login" />
+				</div>
+	        </div>
+		</div>
+	</div>
+
+<div id="mySignUp" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button>
+        <h4 class="modal-title">Sign Up</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+       	<form name="myForm">
+          <div class="col-sm-8" style="margin: 10px">
+				<input type="text" class="form-control" name="FirstName" ng-model="firstname" placeholder="First Name" required></input>
+				<div role="alert">
+			      <span class="error" ng-show="myForm.FirstName.$error.required">
+			       First Name Required!</span>
+			    </div>
+			</div>
+			<div class="col-sm-8" style="margin: 10px">
+				<input type="text" class="form-control" name="LastName" ng-model="lastname" placeholder="Last Name"></input>
+			</div>
+			<div class="col-sm-8" style="margin: 10px">
+				<input type="email" class="form-control" name="Email" ng-model="email" placeholder="Email" required></input>
+				<div role="alert">
+			      <span class="error" ng-show="myForm.Email.$error.required">
+			       Email Required!</span>
+			    </div>
+			</div>
+			<div class="col-sm-8" style="margin: 10px">
+				<input type="text" class="form-control" name="Username" ng-model="username1" placeholder="Username" required></input>
+				<div role="alert">
+			      <span class="error" ng-show="myForm.Username.$error.required">
+			       Username Required!</span>
+			    </div>
+
+			</div>
+
+			<div class="col-sm-8" style="margin: 10px">
+				<input type="password" class="form-control" name="Password" ng-model="password1" placeholder="Password" required></input>
+				<div role="alert">
+			      <span class="error" ng-show="myForm.Passwword.$error.required">
+			       Password Required!</span>
+			    </div>
+
+			</div>
+			<script src="//cdn.jsdelivr.net/webshim/1.14.5/polyfiller.js"></script>
+			<script>
+			    webshims.setOptions('forms-ext', {types: 'date'});
+				webshims.polyfill('forms forms-ext');
+			</script>
+			<div class="col-sm-8" style="margin: 10px">
+				<input type="date" class="form-control" name="Birthdate" ng-model="birthdate" ></input>
+			</div>
+
+
+			<div class="col-sm-8" style="margin: 10px">
+				<input type="text" class="form-control" name="Location" ng-model="location" placeholder="Your Location"></input>
+			</div>
+			
+			<div class="col-sm-8" style="margin: 10px;">
+				<div ng-hide="invalid_signup" class="alert alert-danger ng-hide" >
+					<strong>Incorrect Values</strong>
+				</div>
+				<div ng-hide="unexpected_err" class="alert alert-danger ng-hide" >
+					<strong>Unexpected error, try again</strong>
+				</div>
+			
+				<input type="submit" class="btn btn-primary" ng-click="submitSignUp();" value="Sign Up" />
+			</div>
+        </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <p>Already have an Account? <a href="./">Login>></a> </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

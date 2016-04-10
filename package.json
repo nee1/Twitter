@@ -1,0 +1,16 @@
+{
+  "name": "AngulasJSApplication",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "angucomplete-alt": "^2.2.0",
+    "ejs": "*",
+    "express": "3.2.6"
+  },
+  "scripts": {
+        "start": "node app.js"
+  }
+}
