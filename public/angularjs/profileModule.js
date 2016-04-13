@@ -6,7 +6,7 @@ user.controller('userController',['$scope','$http', function($scope,$http){
 	$scope.usertweets = function(user_id1){
 		$http({
 			method : "GET",
-			url : '/usertweets',
+			url : '/user/tweets/get',
 			params : {
 				userid1 : user_id1
 			}

@@ -1,15 +1,15 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 //var connection = mongoose.connect("mongodb://localhost:27017/users");
-
 //  Getters and Setters
-var getTags = function(tags) {
+/*var getTags = function(tags) {
   return tags.join(',');
 };
 
 var setTags = function(tags) {
   return tags.split(',');
 };
+*/
 
 var tweetSchema = new Schema({
     body: {
@@ -18,7 +18,8 @@ var tweetSchema = new Schema({
         trim: true
     },
     tags: {
-        type: [] 
+        type: [] ,
+        index: true
         //get: getTags, 
         //set: setTags
     },
@@ -26,8 +27,12 @@ var tweetSchema = new Schema({
         type: Boolean, 
         required:false
     },
-    retweetBy: {
-        type: Schema.ObjectId, 
+    originTweetId: {
+        type: Schema.ObjectId,
+        required: false
+    },
+    originTweetBy: {
+        type: String, 
         required:false
     },
     retweetedAt: {
@@ -83,11 +88,11 @@ var userSchema = new Schema({
     },
     
     followers: [{
-        type: Schema.ObjectId, 
+        type: String, 
         ref: 'user'
     }],
     following: [{
-        type: Schema.ObjectId, 
+        type: String, 
         ref: 'user'
     }],
     
@@ -107,6 +112,13 @@ userSchema.methods = {
           this.following.splice(this.following.indexOf(id), 1);
         }
         console.log(this.following);
+    },
+    follower: function(id){
+        if(this.followers.indexOf(id) === -1){
+            this.followers.push(id);
+        } else {
+            this.followers.splice(this.followers.indexOf(id),1);
+        }
     }
 };
 // the schema is useless so far

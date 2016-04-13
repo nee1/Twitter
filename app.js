@@ -1,8 +1,3 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
@@ -53,30 +48,35 @@ if ('development' === app.get('env')) {
 
 //GET
 app.get('/', routes.index);
-app.get('/getuser', user.getuser);
-app.get('/rusers', user.allusers);
-app.get('/getweets', user.getweets);
-app.get('/getretweets',user.getretweets)
+
+app.post('/user/login',login.checkLogin);
+app.get('/home',login.redirectToHomepage);
+app.post('/user/logout',login.logout);
+app.post('/user/signup',login.checkSignUp);
+
+
+app.get('/user/get', user.getuser);
+app.get('/search/user',user.searchuser);
+app.post('/user/follow',user.follow);
+
+app.get('/user/suggest', user.allusers);
+app.get('/user/tweets/get',profile.usertweets);
+app.get('/user/tweets/count',profile.tweetcount);
+app.get('/user/followings/count',profile.followingcount);
+app.get('/user/followers/count',profile.followercount);
+
+app.get('/tweet/getfeed', user.getweets);
+app.post('/tweet/post',user.postweet);
+app.post('/tweet/retweet',user.retweet);
+
+
 app.get('/user',profile.user);
-app.get('/tweetcount',profile.tweetcount);
-app.get('/followingcount',profile.followingcount);
-app.get('/followercount',profile.followercount);
-app.get('/usertweets',profile.usertweets);
 app.get('/hashtag',user.hashtag);
 //app.get('/user/:username',profile.prof);
 //app.get('/signup',signup);
 
 
 //POST
-app.post('/follow',user.follow);
-app.post('/postweet',user.postweet);
-app.post('/retweet',user.retweet);
-app.get('/searchuser',user.searchuser);
-
-app.post('/checklogin',login.checkLogin);
-app.get('/homepage',login.redirectToHomepage);
-app.post('/logout',login.logout);
-app.post('/checksignup',login.checkSignUp);
 
 
 // connect to the mongo collection session and then createServer

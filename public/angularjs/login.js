@@ -6,11 +6,10 @@ login.controller('loginController', function($scope,$filter ,$http) {
 	$scope.invalid_signup = true;
 	$scope.unexpected_err = true;
 
-
 	$scope.submitLogin = function() {
 		$http({
 			method : "POST",
-			url : '/checklogin',
+			url : '/user/login',
 			data : {
 				"username" : $scope.username,
 				"password" : $scope.password
@@ -22,7 +21,7 @@ login.controller('loginController', function($scope,$filter ,$http) {
 			}
 			else
 			{
-				window.location.assign("/homepage");				
+				window.location.assign("/home");				
 			}
 		}).error(function(error) {
 			$scope.unexpected_error = false;
@@ -33,7 +32,7 @@ login.controller('loginController', function($scope,$filter ,$http) {
 	$scope.submitSignUp = function(){	
 		$http({
 			method : "POST",
-			url	: '/checksignup',
+			url	: '/user/signup',
 			data : {
 				"username" : $scope.username1,
 				"password" : $scope.password1,
@@ -50,7 +49,7 @@ login.controller('loginController', function($scope,$filter ,$http) {
 			}
 			else
 			{	
-				window.location.assign("/homepage");	
+				window.location.assign("/home");	
 			}
 		}).error(function(error){
 			$scope.unexpected_err = false;

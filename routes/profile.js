@@ -1,14 +1,14 @@
 var ejs = require("ejs");
 var mysql = require('./mysql');
 var requestGen = require('./commons/responseGenerator');
+var Users = require('./models/userModel');
+
 
 exports.user = function(req,res){
-	var userid;
-	userid = req.param("userid");
-	
-	var userquery = "select * from users where id = "+userid;
+	var username1 = req.param("username");
+	//var userquery = "select * from users where id = "+userid;
 
-	mysql.fetchData(userquery,function(err,results){
+	Users.find({username:username1},function(err,results){
 		if(err){
 			throw err;
 		}
@@ -29,65 +29,66 @@ exports.user = function(req,res){
 };
 
 exports.tweetcount = function(req,res){
-	var userid = req.param("userid1");
+	var uname = req.param("username");
+	//var tweetcq = "select * from tweets left join users on tweets.user_id = users.id where user_id = "+ userid;
 	
-	var tweetcq = "select * from tweets left join users on tweets.user_id = users.id where user_id = "+ userid;
-	
-	mysql.fetchData(tweetcq,function(err,results1){
+	Users.findOne({username:uname},function(err,results){
 		if(err){
-			throw err;
+			res.send(requestGen.responseGenerator(401,null))
 		}
 		else{
-			console.log(results1);
-			res.send(requestGen.responseGenerator(200,results1));
+			console.log(results);
+			res.send(requestGen.responseGenerator(200,results.tweets.length ? results.tweets.length : 0));
 		}
 	});
 	
 };
 
 exports.followingcount = function(req,res){
-	var userid = req.param("userid2");
-	
-	var followingcq = "select * from following right join users on following.follow_uname=users.id where following.user_uname = "+userid;
+	var uname = req.param("username");
 
-	mysql.fetchData(followingcq,function(err,results2){
+	//var followingcq = "select * from following right join users on following.follow_uname=users.id where following.user_uname = "+userid;
+
+
+	Users.findOne({username:uname},function(err,results){
 		if(err){
-			throw err;
+			res.send(requestGen.responseGenerator(401,null))
 		}
 		else{
-			console.log(results2);
-			res.send(requestGen.responseGenerator(200,results2));
+			console.log(results);
+			res.send(requestGen.responseGenerator(200,results.following ? results.following : 0));
 		}
 	});
 
 };
 
 exports.followercount = function(req,res){
-	var userid = req.param("userid3");
+	var uname = req.param("username");
 	
-	var followercq = "select distinct * from following left join users on following.user_uname = users.id where following.follow_uname = "+userid;
+	//var followercq = "select distinct * from following left join users on following.user_uname = users.id where following.follow_uname = "+userid;
 
-	mysql.fetchData(followercq,function(err,results3){
+	Users.findOne({username:uname},function(err,results){
 		if(err){
-			throw err;
+			res.send(requestGen.responseGenerator(401,null))
 		}
 		else{
-			console.log(results3);
-			res.send(requestGen.responseGenerator(200,results3));
+			console.log(results);
+			res.send(requestGen.responseGenerator(200,results.followers ? results.followers : 0));
 		}
 	});
 };
 
 exports.usertweets = function(req,res){
-	var userid1 = req.param("userid1");
-	var query = "select * from tweets where user_id =" + userid1;
+	var uname = req.param("username");
+	//var query = "select * from tweets where user_id =" + userid1;
 
-	mysql.fetchData(query,function(err,results){
+	Users.findOne({username:uname},function(err,results){
 		if(err){
-			throw err;
+			res.send(requestGen.responseGenerator(401,null))
 		}
 		else{
-			requestGen.responseGenerator(200,results);
+			console.log(results);
+			res.send(requestGen.responseGenerator(200,results.tweets));
 		}
 	});
 };

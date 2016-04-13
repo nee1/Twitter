@@ -16,7 +16,7 @@ exports.checkLogin = function(req,res)
 	console.log(password1 +" is the password");
 	var json_responses;
 	console.log(username1 +" username in checkLogin ");
-	Users.find( {username:username1,password:password1} ,function(err,users){
+	Users.findOne( {username:username1,password:password1} ,function(err,users){
 		if(err){
 			console.log("error at username password");
 			throw err;
@@ -24,10 +24,11 @@ exports.checkLogin = function(req,res)
 		else
 		{
 			console.log("users :"+users);
+			req.session.username = username1;
 			res.send(users);
 		}
 	});
-	var json_responses;
+	//var json_responses;
 	
 };
 
