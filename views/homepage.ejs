@@ -25,10 +25,10 @@
 </head>
 
 <body ng-app="userModule" ng-controller="userController">
-	<script type="text/javascript"> 
+	<script type="text/javascript">
 		x = '<%= userid %>';
 		uname = '<%= username %>';
- 	</script> 
+ 	</script>
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -48,7 +48,7 @@
         <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-      	<li>			
+      	<li>
 				<input class="form-control" style="margin-top: 8.5px" type="" ng-model="searchkey" ng-keypress="search()" placeholder="search"></input>
 			</li>
 	      <li><a data-toggle="modal" href="#myTweet"><i class="fa fa-twitter"></i>  Tweet</a></li>
@@ -59,26 +59,26 @@
 	      </li>
 
      	</ul>
-     	</div> 
+     	</div>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-		  
+
 	<div class="col-md-3" ng-init="getuser(uname1); tweetCount(uname1); followingCount(uname1); followerCount(uname1);">
-		
+
 		<div class="twPc-div">
     		<a class="twPc-bg twPc-block"></a>
 
 			<div>
             <!-- Twitter Button | you can get from: https://about.twitter.com/tr/resources/buttons#follow -->
-            
+
 			<a title="" href="" class="twPc-avatarLink">
 				<img alt="" src="https://g.twimg.com/about/feature-corporate/image/twitterbird_RGB.png" class="twPc-avatarImg">
 			</a>
 			</div>
 		<div class="twPc-divUser">
 			<div class="twPc-divName">
-				<a href="/user?username={{userInfo.username}}">{{userInfo.first_name + " "+ userInfo.last_name}}</a>
+				<a href="/user?username={{userInfo.username}}">{{userInfo.first + " "+ userInfo.last}}</a>
 			</div>
 			<span>
 				<a href="/user?username={{userInfo.username}}">@{{userInfo.username}}<span></span></a>
@@ -109,7 +109,6 @@
 		</div>
 	</div>
 
-
 	</div>
 
 	<div  class="col-md-6">
@@ -118,7 +117,7 @@
 
 
 			<div class="" ng-repeat="tweet in tweets">
-				<div class="tweetStyle"> 
+				<div class="tweetStyle">
 					<div ng-show="tweet.tweetdata.isRetweet">
 						<i class="fa fa-retweet"></i><small> {{tweet.first + " " + tweet.last}} @{{tweet.username}} Retweeted </small> <br>
 						<span style="font-size: 20px; margin-bottom: 10px; padding-bottom: 10px;"> @{{tweet.tweetdata.originTweetBy}} </span>
@@ -131,18 +130,21 @@
 						<br>
 					</div>
 					<p style="font: 15px; margin-top:10px;"> <span ng-bind-html="toTrustedHTML(tweet.tweetdata.body)"> </span></p>
-					
-					
-					<i class="fa fa-retweet" data-toggle="modal" ng-style="tweet.tweetdata.isRetweet && {'color':'blue'}" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i>{{tweet.tweetdata.retweetCount}}
+					<!-- <div ng-show="uname1==tweet.username && !tweet.tweetdata.isRetweet">
+						<i class="fa fa-retweet" ng-style="uname1 == tweet.username && {'color':'gray'}" data-toggle="modal" ng-style="" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i><span ng-hide="tweet.tweetdata.retweetCount==0">{{tweet.tweetdata.retweetCount}}</span> 
+					</div> ng-show="tweet.tweetdata.isRetweet"-->
+					<div>
+						<i class="fa fa-retweet" ng-style="tweet.tweetdata.isRetweet && {'color':'blue'} || uname1 == tweet.username && {'color':'gray'}" data-toggle="modal" ng-style="" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i><span ng-hide="tweet.tweetdata.retweetCount==0">{{tweet.tweetdata.retweetCount}}</span>
+					</div>
 				</div>
 		  </div>
-		</div>	
+		</div>
 	</div>
 	<div class="col-md-2">
-			
+
 			<span style="margin-bottom: 10px;">Suggested Users</span>
 			<div style="border: 1px solid rgba(180, 173, 173, 0.56); padding: 5px;" ng-repeat="ruser in allusers">
-				 
+
 				 <a href="/user?username={{ruser.username}}">{{ruser.first + " " + ruser.last}} <small>@{{ruser.username}} </small></a><br>
 				 <i  class="fa fa-plus" ng-click="follow(ruser.username);">  Follow </i>
 			</div>
@@ -185,6 +187,19 @@
 </div>
 </div>
 
+	<table class="table table-striped searchTable">
+    <tbody ng-if="userSearch.length>0" ng-repeat="us in userSearch">
+	      <tr>
+	        <td><a href="./user?username={{us.username}}">{{us.first + "" + us.last}} @{{us.username}}</a></td>
+	      </tr>
+   	</tbody>
+		<tbody ng-if="tagSearch.length>0" ng-repeat="htag in tagSearch">
+	      <tr>
+	        <td><a ng-href="./hashtag?keyword={{htag.substr(1)}}">{{htag}}</a></td>
+	      </tr>
+   	</tbody>
+	</table>
+
 
 <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="Following">
   <div class="modal-dialog modal-sm">
@@ -194,12 +209,12 @@
 		</div>
 		<div ng-model="followings" >
 		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="following in followings">
-			 {{following.first + " " + following.last}} : @{{following.username}} 
+			 {{following.first + " " + following.last}} : @{{following.username}}
 		  </div>
 		</div>
 	 </div>
   </div>
-</div>
+</disv>
 
 <div class="modal fade bs-example-modal-sm1" tabindex="-1" role="dialog" aria-labelledby="Follwers">
   <div class="modal-dialog modal-sm">
@@ -209,7 +224,7 @@
 		</div>
 		<div ng-model="followers" >
 		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="follower in followers">
-			 {{follower.first + " " + follower.last}} : @{{follower.username}} 
+			 {{follower.first + " " + follower.last}} : @{{follower.username}}
 
 		  </div>
 		</div>
@@ -217,14 +232,6 @@
   </div>
 </div>
 
-
-	<table class="table table-striped searchTable">
-    	<tbody ng-repeat="us in userSearch">
-	      <tr>
-	        <td><a href="./user?username={{us.username}}">{{us.first + "" + us.last}} @{{us.username}}</a></td>
-	      </tr>
-   	</tbody>
-	</table>
 
 <script type="text/javascript">
 		$('#retweet').on('show.bs.modal', function (event) {

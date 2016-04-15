@@ -5,12 +5,12 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 	var user_id = window.x;
 	var uname1 = window.uname;
 
-	console.log("in user controller")
+	console.log("in user controller");
 	console.log(user_id);
 
 	$scope.user = null;
 	$scope.user1 = null;
-	
+
 	$scope.toTrustedHTML = function (html) {
     return $sce.trustAsHtml(html);
   	};
@@ -24,15 +24,15 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 				"username" : username
 			}
 		}).success(function(response){
-			if (response.status == 200) {
+			if (response.status === 200) {
 				console.log("success on getuser" + response.data);
 				$scope.userInfo = response.data;
 			}
 		});
-	}
-	
+	};
+
 	$http.get('/user/suggest').success(function(response){
-		if (response.status == 200) {		
+		if (response.status === 200) {
 			$scope.allusers = response.data.slice(0,5);
 			console.log("success at rusers" + $scope.allusers);
 			$scope.updateFeed();
@@ -41,41 +41,68 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 
 	$scope.search = function(){
 		var keyword = $scope.searchkey;
-		if(keyword == ""){
-			$scope.userSearch = "";
+		$scope.userSearch = [];
+		$scope.tagSearch = [];
+		if(keyword === ""){
+			$scope.userSearch = [];
+			$scope.tagSearch = [];
 		}
-		$http({
-			method: "GET",
-			url: '/search/user',
-			params: {
-				searchkey : keyword
+		console.log(keyword);
+		if(keyword && keyword.length>2){
+			//console.log("keyword at 0");
+			//console.log(keyword.charAt(0));
+			if(keyword.charAt(0) == "#"){
+				console.log("in tag search");
+				$http({
+					method: "GET",
+					url: '/search/tag',
+					params: {
+						searchkey : keyword.substr(1)
+					}
+				}).success(function(response){
+					console.log(response.data);
+					$scope.tagSearch = response.data;
+				});
 			}
-		}).success(function(response){
-			if(response.status == 200){
-				$scope.userSearch = response.data;
+			else {
+				$http({
+					method: "GET",
+					url: '/search/user',
+					params: {
+						searchkey : keyword
+					}
+				}).success(function(response){
+					if(response.data){
+						console.log("search data: ");
+						$scope.userSearch = response.data;
+						console.log($scope.userSearch);
+					}
+					else{
+						$scope.userSearch = "";
+					}
+				});
 			}
-			else{
-				$scope.userSearch = "";
-			}
-		});
+		}
 	};
+
 
 	$scope.updateFeed = function(){
 		$http.get('/tweet/getfeed').success(function(response){
-			if(response.status == 200){
+			if(response.status === 200){
 				console.log(response.data);
-				for(tweet in response.data)
-				{	
-					var temp = response.data[tweet].tweetdata.body.match(/#\w+/g);	
-					for(t in temp){
-						response.data[tweet].tweetdata.body = response.data[tweet].tweetdata.body.replace(temp[t], "<a href='/hashtag?keyword="+temp[t].substr(1)+"'>"+temp[t]+"</a>");
-					}
-				};
-				$scope.tweets = response.data.reverse();
+				for(var tweet in response.data){
+						var temp = response.data[tweet].tweetdata.body.match(/#\w+/g);
+						for(var t in temp){
+								response.data[tweet].tweetdata.body = response.data[tweet].tweetdata.body.replace(temp[t], "<a href='/hashtag?keyword="+temp[t].substr(1)+"'>"+temp[t]+"</a>");
+						}
+				}
+
+				$scope.tweets = response.data.sort(function compareDate(a, b){
+					return new Date(b.createdAt) - new Date(a.createdAt);
+				});
 				console.log($scope.tweets);
 			}
-		});		
-		
+		});
 	};
 
 
@@ -88,7 +115,7 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 				"username" : username
 			}
 		}).success(function(res){
-			if(res.status == 200){
+			if(res.status === 200){
 				console.log(res.data[0].username);
 				return res.data[0];
 			}
@@ -110,9 +137,9 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 		});
 	};
 
-	
+
 	$scope.retweet = function(){
-	
+
 		angular.element(jQuery('#retweetid1')).triggerHandler('input');
 		//$scope.retweetSuccess = false;
 		$http({
@@ -122,7 +149,7 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 				"tweet_id" : $scope.retweet_id1
 			}
 		}).success(function(response){
-			if(response.data == true){
+			if(response.data === true){
 				$scope.retweet_undo = true;
 				$scope.retweetSuccess = true;
 				//$scope.retweet_again="Already retweeted";
@@ -143,7 +170,7 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 				"follow_uname" : follow_uname
 			}
 		}).success(function(response){
-			if(response.status == 200){
+			if(response.status === 200){
 				console.log("followed : " + JSON.stringify(response.data));
 				$scope.followhide = true;
 			}
@@ -156,10 +183,10 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 			method : "GET",
 			url : "user/tweets/count",
 			params : {
-				"username" : username 
+				"username" : username
 			}
 		}).success(function(response){
-			if(response.status == 200){
+			if(response.status === 200){
 				$scope.tweetCount = response.data.length ? response.data.length : 0;
 				//why
 				$scope.usertweets = response.data;
@@ -169,8 +196,8 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 
 	$scope.getweet = function(tweetid){
 
-		for (tweet in $scope.tweets){
-			if(tweet.tweet_id == tweetid){
+		for (var tweet in $scope.tweets){
+			if(tweet.tweet_id === tweetid){
 				return tweet;
 			}
 		}
@@ -183,10 +210,10 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 			method : "GET",
 			url : "/user/followings/count",
 			params : {
-				"username" : username 
+				"username" : username
 			}
 		}).success(function(response){
-			if(response.status == 200){
+			if(response.status === 200){
 				$scope.followingCount = response.data.length;
 				$scope.followings = response.data;
 			}
@@ -200,14 +227,14 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 			method : "GET",
 			url : "/user/followers/count",
 			params : {
-				"username" : username 
+				"username" : username
 			}
 		}).success(function(response){
-			if(response.status == 200){
+			if(response.status === 200){
 				$scope.followerCount = response.data.length;
 				$scope.followers = response.data;
 			}
 		});
-	};	
+	};
 
 }]);

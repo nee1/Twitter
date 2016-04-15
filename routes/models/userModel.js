@@ -13,18 +13,23 @@ var setTags = function(tags) {
 
 var tweetSchema = new Schema({
     body: {
-        type: String, 
-        default: '', 
+        type: String,
+        default: '',
         trim: true
     },
     tags: {
         type: [] ,
         index: true
-        //get: getTags, 
+        //get: getTags,
         //set: setTags
     },
+    retweetCount : {
+        type : Number,
+        required: false,
+        default: 0
+    },
     isRetweet: {
-        type: Boolean, 
+        type: Boolean,
         required:false
     },
     originTweetId: {
@@ -32,16 +37,16 @@ var tweetSchema = new Schema({
         required: false
     },
     originTweetBy: {
-        type: String, 
+        type: String,
         required:false
     },
-    retweetedAt: {
-        type: Date, 
+    originTweetAt: {
+        type: Date,
         required:false
     },
     //if retweet this is real tweet time
     createdAt: {
-        type: Date, 
+        type: Date,
         default: Date.now
     }
     //user: {type: Schema.ObjectId, ref: 'User'},
@@ -86,16 +91,16 @@ var userSchema = new Schema({
     	type: String,
     	require: false
     },
-    
+
     followers: [{
-        type: String, 
-        ref: 'user'
+        type: Schema.ObjectId,
+        ref: 'User'
     }],
     following: [{
-        type: String, 
-        ref: 'user'
+        type: Schema.ObjectId,
+        ref: 'User'
     }],
-    
+
     tweets: [tweetSchema]
 },{
     timestamps: true,
@@ -123,7 +128,7 @@ userSchema.methods = {
 };
 // the schema is useless so far
 // we need to create a model using it
-var Users = mongoose.model('user', userSchema);
+var Users = mongoose.model('User', userSchema);
 
 // make this available to our Node applications
 module.exports = Users;

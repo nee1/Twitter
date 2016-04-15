@@ -31,17 +31,17 @@ exports.user = function(req,res){
 exports.tweetcount = function(req,res){
 	var uname = req.param("username");
 	//var tweetcq = "select * from tweets left join users on tweets.user_id = users.id where user_id = "+ userid;
-	
+
 	Users.findOne({username:uname},function(err,results){
 		if(err){
-			res.send(requestGen.responseGenerator(401,null))
+			res.send(requestGen.responseGenerator(401,null));
 		}
 		else{
 			console.log(results);
 			res.send(requestGen.responseGenerator(200,results.tweets.length ? results.tweets.length : 0));
 		}
 	});
-	
+
 };
 
 exports.followingcount = function(req,res){
@@ -50,32 +50,36 @@ exports.followingcount = function(req,res){
 	//var followingcq = "select * from following right join users on following.follow_uname=users.id where following.user_uname = "+userid;
 
 
-	Users.findOne({username:uname},function(err,results){
-		if(err){
-			res.send(requestGen.responseGenerator(401,null))
-		}
-		else{
-			console.log(results);
-			res.send(requestGen.responseGenerator(200,results.following ? results.following : 0));
-		}
-	});
-
+	Users.findOne({username:uname})
+		.populate('following')
+		.exec(function(err,results){
+			if(err){
+				console.log("following count : " + err);
+				res.send(requestGen.responseGenerator(401,null));
+			}
+			else{
+				console.log("following count doc : " + results);
+				res.send(requestGen.responseGenerator(200,results.following));
+			}
+		});
 };
 
 exports.followercount = function(req,res){
 	var uname = req.param("username");
-	
+
 	//var followercq = "select distinct * from following left join users on following.user_uname = users.id where following.follow_uname = "+userid;
 
-	Users.findOne({username:uname},function(err,results){
-		if(err){
-			res.send(requestGen.responseGenerator(401,null))
-		}
-		else{
-			console.log(results);
-			res.send(requestGen.responseGenerator(200,results.followers ? results.followers : 0));
-		}
-	});
+	Users.findOne({username:uname})
+		.populate('followers')
+		.exec(function(err,results){
+			if(err){
+				res.send(requestGen.responseGenerator(401,null));
+			}
+			else{
+				console.log(results.followers);
+				res.send(requestGen.responseGenerator(200,results.followers));
+			}
+		});
 };
 
 exports.usertweets = function(req,res){
@@ -84,7 +88,7 @@ exports.usertweets = function(req,res){
 
 	Users.findOne({username:uname},function(err,results){
 		if(err){
-			res.send(requestGen.responseGenerator(401,null))
+			res.send(requestGen.responseGenerator(401,null));
 		}
 		else{
 			console.log(results);

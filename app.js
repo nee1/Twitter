@@ -22,7 +22,7 @@ app.use(expressSession({
   secret: 'cmpe273_teststring',
   resave: false,  //don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  duration: 30 * 60 * 1000,    
+  duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000,
   store: new mongoStore({
     url: mongoSessionConnectURL
@@ -56,7 +56,8 @@ app.post('/user/signup',login.checkSignUp);
 
 
 app.get('/user/get', user.getuser);
-app.get('/search/user',user.searchuser);
+app.get('/search/user',user.searchUser);
+app.get('/search/tag',user.searchTag);
 app.post('/user/follow',user.follow);
 
 app.get('/user/suggest', user.allusers);
