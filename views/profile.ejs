@@ -26,7 +26,9 @@
 </head>
 
 <body ng-app="userModule" ng-controller="userController">
-	<script type="text/javascript"> x = '<%= userid %>';
+	<script type="text/javascript">
+		x2 = '<%= userid1 %>';
+		uname3 = '<%= uname1 %>';
  </script>
 
 <nav class="navbar navbar-default">
@@ -45,7 +47,7 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+        <li class="active"><a href="/home">Home <span class="sr-only">(current)</span></a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
 	      <li><a data-toggle="modal" href="#myTweet"><i class="fa fa-twitter"></i> Tweet</a></li>
@@ -58,10 +60,10 @@
      	</ul>
      	</div>
     </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+  </div><!-- /.container-fluid usertweets(window.uname);-->
 </nav>
 
-	<div class="col-md-3" ng-init="getuser(user_id); tweetCount(user_id); followingCount(user_id); followerCount(user_id); follow(user_id);">
+	<div class="col-md-3" ng-init="getuser(uname3); tweetCount(uname3); followingCount(uname3); followerCount(uname3); ">
 		<div class="twPc-div">
     		<a class="twPc-bg twPc-block"></a>
 
@@ -92,7 +94,7 @@
 		<div class="twPc-divStats">
 			<ul class="twPc-Arrange">
 				<li class="twPc-ArrangeSizeFit">
-					<a href="/user?userid={{userInfo.id}}" title="">
+					<a href="/user?username={{userInfo.username}}" title="">
 						<span class="twPc-StatLabel twPc-block">Tweets</span>
 						<span class="twPc-StatValue">{{tweetCount}}</span>
 					</a>
@@ -117,7 +119,7 @@
 
 <div class="col-md-7">
     <div style= " " ng-model="usertweets">
-			<div class="" ng-repeat="tweet in tweets">
+			<div class="" ng-repeat="tweet in usrtweets">
 				<div class="tweetStyle">
 					<div ng-show="tweet.tweetdata.isRetweet">
 						<i class="fa fa-retweet"></i><small> {{tweet.first + " " + tweet.last}} @{{tweet.username}} Retweeted </small> <br>
@@ -160,31 +162,31 @@
 
 <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="Following">
   <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-    	<div class="modal-header">
-	        <h4 class="modal-title" id="gridSystemModalLabel">Following</h4>
-    	</div>
-    	<div ng-model="followings" >
-    		<div class="" ng-repeat="following in followings">
-    			{{following.first_name + " " + following.last_name}} : @{{following.username}}
-    		</div>
-    	</div>
-    </div>
+	 <div class="modal-content">
+		<div class="modal-header">
+			 <h4 class="modal-title" id="gridSystemModalLabel">Following</h4>
+		</div>
+		<div ng-model="followings" >
+		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="following in followings">
+			 {{following.first + " " + following.last}} : @{{following.username}}
+		  </div>
+		</div>
+	 </div>
   </div>
 </div>
 
-<div class="modal fade bs-example-modal-sm1" tabindex="-1" role="dialog" aria-labelledby="Follwers">
+<div class="modal fade bs-example-modal-sm1" tabindex="-1" role="dialog" aria-labelledby="Followers">
   <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-    	<div class="modal-header">
-	        <h4 class="modal-title" id="gridSystemModalLabel">Followers</h4>
-    	</div>
-    	<div ng-model="followers" >
-    		<div class="" ng-repeat="follower in followers">
-    			{{follower.first_name + " " + follower.last_name}} : @{{follower.username}}
-    		</div>
-    	</div>
-    </div>
+	 <div class="modal-content">
+		<div class="modal-header">
+			 <h4 class="modal-title" id="gridSystemModalLabel">Followers</h4>
+		</div>
+		<div ng-model="followers" >
+		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="follower in followers">
+			 {{follower.first + " " + follower.last}} : @{{follower.username}}
+		  </div>
+		</div>
+	 </div>
   </div>
 </div>
 

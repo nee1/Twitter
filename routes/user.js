@@ -142,15 +142,15 @@ exports.searchTag = function(req,res){
       }
       else {
         console.log("results in hashtag");
-        console.log(results);
+        //console.log(results);
         var doc = [];
         results.forEach(function(res){
-          if(doc.indexOf(res.tags) === -1){
+          if(doc.indexOf(res.tags) == -1){
             doc.push(res.tags);
           }
         });
         console.log("logged all tags");
-        console.log(doc);
+        //console.log(doc);
         res.send(resGen.responseGenerator(200,doc));
         //tweetSearchData = results;
       }
@@ -166,7 +166,7 @@ exports.postweet = function(req,res){
 	temp.tags = tweetbody.match(/#\w+/g);
 	temp.isRetweet = false;
 
-	console.log("hashtags :" + tweetbody.match(/#\w+/g));
+	//console.log("hashtags :" + tweetbody.match(/#\w+/g));
 	//console.log(temp);
 	//tweetquery = "insert into tweets (`user_id`,`content`) values ('" + username + "','" + tweet + "')";
 
@@ -188,7 +188,7 @@ exports.postweet = function(req,res){
 				{
           var tempid;
           console.log("tweet save for id");
-          console.log(result);
+          //console.log(result);
           for(tw in result.tweets){
             if(tw.body == tweetbody){
               tempid = tw._id;
@@ -213,7 +213,7 @@ exports.postweet = function(req,res){
               }
         		}
           });
-          }*/
+          /**/
           for(tag in temp.tags){
             var htag = Hashtags({
               tags: temp.tags[tag],
@@ -227,20 +227,20 @@ exports.postweet = function(req,res){
               }
             });
           }
-        }
           console.log("tags stored like this");
-          console.log(htag);
+          //console.log(htag);
 					res.send(resGen.responseGenerator(200,temp));
 				}
 			});
+    }
 	});
-};
+}
 
 exports.retweet = function(req,res){
 
 	var username1 = req.session.username;
 	var tweetid = req.param("tweet_id");
-	console.log("tweetid for retweet : " + tweetid );
+	//console.log("tweetid for retweet : " + tweetid );
 	//var tweetquery = "insert into retweets (`user_id`,`tweet_id`) values ('" + userid + "','" + tweetid + "')";
 	var tempTweet = [], retweetSuccess = false,i;
 
@@ -249,7 +249,7 @@ exports.retweet = function(req,res){
 	//temp["tags"] = tweet.match(/#\w+/g).toString();
 	//temp["isRetweet"] = false;
 
-	Users.findOne({'tweets._id' : tweetid }, function(err,user){
+	Users.findOne({'tweets._id' : tweetid }, function(err,tuser){
 		if(err){
 			console.log("tweetid :" + tweetid +" not found");
 			res.send(resGen.responseGenerator(401,null));
@@ -258,77 +258,92 @@ exports.retweet = function(req,res){
 			//console.log("user for retweet : "+ user);
 
 			//console.log("for retweet"+tempTweet);
+      if(tuser.username == username1){
+        res.send(resGen.responseGenerator(401,"Can't retweet your own tweets"));
+      }
+      else {
+        Users.findOne({'username':username1},function(err,ruser){
+          if(err){
+              res.send(resGen.responseGenerator(401,null));
+          }
+          else{
+            //console.log("in user for retweet");
+            //console.log(ruser);
+            //console.log("indexOf tweetid: " + ruser.tweets.indexOf(tweetid));
+            var i,retweet_exists = -1,rcount_id;
+            for(i=0; i<ruser.tweets.length; i++){
+              if(ruser.tweets[i].originTweetId == tweetid){
+                retweet_exists=i;
+              }
+            }
+            console.log("tweetid");
+            console.log(tweetid);
+            for(i=0; i<tuser.tweets.length; i++){
+            //	console.log("tweet ["+ i +"]: " + tuser.tweets[i]._id);
+              //console.log(tuser.tweets[i]._id);
+              if(tuser.tweets[i]._id == tweetid){
+                //i = tuser.tweets.indexOf(tweetid);
+                //console.log("index " + i);
+                tempTweet = {
+                'body' : tuser.tweets[i].body,
+                'isRetweet' : true,
+                'originTweetBy' : tuser.username,
+                'originTweetId': tweetid,
+                'originTweetAt' : tuser.tweets[i].createdAt,
+                'createdAt': Date.now()
+                };
+                rcount_id = i;
+                console.log("rcount_id");
+                console.log(rcount_id);
+              }
+            }
+            console.log(tempTweet);
+            console.log("retwee count before");
+            console.log(tuser.tweets[rcount_id].retweetCount);
+            if( retweet_exists > -1 ){
+              console.log("index of tid at exists");
+              console.log(ruser.tweets[retweet_exists]);
+              ruser.tweets.splice(ruser.tweets[retweet_exists],1);
+              retweetSuccess = false;
+              //console.log("tuser tweets indexof");
+              //console.log(tuser.tweets.indexOf(rcount_id));
+              tuser.tweets[rcount_id].retweetCount = tuser.tweets[rcount_id].retweetCount - 1;
+              console.log("undo retweet");
+            } else {
+              //console.log("tweets length :" + user.tweets.length );
+              ruser.tweets.push(tempTweet);
+              retweetSuccess = true;
+              //console.log(tuser.tweets);
+              //console.log("tuser tweets indexof 0");
+              //console.log(tuser.tweets[0]);
+              tuser.tweets[rcount_id].retweetCount = tuser.tweets[rcount_id].retweetCount + 1;
+              console.log("retweet pushed");
+            }
+            //console.log(result);
+            console.log("retweet count after");
+            console.log(tuser.tweets[rcount_id].retweetCount);
+            tuser.save(function(err,data){
+              if(err){
+                console.log(err);
+                res.send(resGen.responseGenerator(401,null));
+              }
+            });
 
-			Users.findOne({'username':username1},function(err,result){
-				if(err){
-						res.send(resGen.responseGenerator(401,null));
-				}
-				else{
-					//console.log("in user for retweet");
-					//console.log(result);
-					console.log("indexOf tweetid: " + result.tweets.indexOf(tweetid));
-					var ind = -1,tc;
-					for(i=0; i<result.tweets.length; i++){
-						if(result.tweets[i].originTweetId === tweetid){
-							ind=i;
-						}
-					}
-					for(i=0; i<user.tweets.length; i++){
-					//	console.log("tweet ["+ i +"]: " + user.tweets[i]._id);
-						//console.log(user.tweets[i]._id);
-						if(user.tweets[i]._id === tweetid){
-							//i = user.tweets.indexOf(tweetid);
-							//console.log("index " + i);
-							tempTweet = {
-							'body' : user.tweets[i].body,
-							'isRetweet' : true,
-							'originTweetBy' : user.username,
-							'originTweetId': tweetid,
-							'originTweetAt' : user.tweets[i].createdAt,
-							'createdAt': Date.now()
-							};
-							tc = i;
-						}
-					}
-
-					if( ind !== -1 ){
-						console.log("indexOf tweetid for undo: " + ind);
-						result.tweets.splice(result.tweets.indexOf(tweetid),1);
-						retweetSuccess = false;
-						user.tweets[tc].retweetCount = user.tweets[tc].retweetCount - 1;
-						console.log("undo retweet");
-					} else {
-						console.log("tweets length :" + user.tweets.length );
-						//console.log("indexOf tweetid : " + result.tweets.indexOf(tweetid));
-						result.tweets.push(tempTweet);
-						retweetSuccess = true;
-						user.tweets[tc].retweetCount = user.tweets[tc].retweetCount + 1;
-						console.log("retweet pushed");
-
-					}
-					//console.log(result);
-
-					user.save(function(err,data){
-						if(err){
-							console.log(err);
-							res.send(resGen.responseGenerator(401,null));
-						}
-					});
-
-					result.save(function(err,data){
-						if(err){
-							console.log(err);
-							res.send(resGen.responseGenerator(401,null));
-						}
-						else
-						{
-							//var doc = {'data':data, 'undoRetweet':retweetSuccess};
-							//console.log("retweet save log: "+ doc);
-							res.send(resGen.responseGenerator(200,retweetSuccess));
-						}
-					});
-				}
-			});
+            ruser.save(function(err,data){
+              if(err){
+                console.log(err);
+                res.send(resGen.responseGenerator(401,null));
+              }
+              else
+              {
+                //var doc = {'data':data, 'undoRetweet':retweetSuccess};
+                //console.log("retweet save log: "+ doc);
+                res.send(resGen.responseGenerator(200,retweetSuccess));
+              }
+            });
+          }
+        });
+      }
 		}
 	});
 };
@@ -388,50 +403,57 @@ exports.follow = function(req,res){
 	var username1 = req.session.username;
 	var follow_uname = req.param("follow_uname");
 	//var followquery = "insert into following (`user_uname`,`follow_uname`) values ('" + userid + "','" + followid + "')";
-
-	Users.findOne({username:username1},function(err, user){
-		if(err)
-		{
-			res.send(resGen.responseGenerator(401,null));
-		}
-		else
-		{
-			Users.findOne({username:follow_uname},function(err, follower){
-				if(err)
-				{
-					res.send(resGen.responseGenerator(401,null));
-				}
-				else
-				{
-					if(user){
-						if (user.following.indexOf(follower._id) === -1) {
-							user.following.push(follower._id);
-							user.save(function(err,res1){
-				           		if(err){
-				           			res.send(resGen.responseGenerator(401,null));
-				           		}
-				           	});
-				        }
-				        /*else {
-				          this.following.splice(this.following.indexOf(id), 1);
-				        }*/
-					}
-					if(follower){
-						if (follower.followers.indexOf(user._id) === -1) {
-				        	follower.followers.push(user._id);
-				        	follower.save(function(err,res2){
-				           		if(err){
-				           			res.send(resGen.responseGenerator(401,null));
-				           		}
-				           	});
-				        } /*else {
-				            this.followers.splice(this.followers.indexOf(id),1);
-				        }*/
-					}
-					console.log("follow follower success");
-					res.send(resGen.responseGenerator(200,follow_uname));
-				}
-			});
-		}
-	});
+  console.log(username1);
+  console.log(follow_uname);
+  if(username1 == follow_uname){
+    console.log("same user");
+    res.send(resGen.responseGenerator(400,null));
+  }
+  else{
+    Users.findOne({username:username1},function(err, user){
+      if(err)
+      {
+        res.send(resGen.responseGenerator(401,null));
+      }
+      else
+      {
+        Users.findOne({username:follow_uname},function(err, follower){
+          if(err)
+          {
+            res.send(resGen.responseGenerator(401,null));
+          }
+          else
+          {
+            if(user){
+              if (user.following.indexOf(follower._id) == -1) {
+                user.following.push(follower._id);
+              }
+              else {
+                user.following.splice(user.following.indexOf(user._id), 1);
+              }
+              user.save(function(err,res1){
+                  if(err){
+                    res.send(resGen.responseGenerator(401,null));
+                  }
+              });
+            }
+            if(follower){
+              if (follower.followers.indexOf(user._id) == -1) {
+                    follower.followers.push(user._id);
+              } else {
+                  follower.followers.splice(follower.followers.indexOf(user._id),1);
+              }
+              follower.save(function(err,res2){
+                  if(err){
+                    res.send(resGen.responseGenerator(401,null));
+                  }
+              });
+            }
+            console.log("follow follower success");
+            res.send(resGen.responseGenerator(200,follow_uname));
+          }
+        });
+      }
+    });
+  }
 };

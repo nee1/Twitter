@@ -17,8 +17,8 @@ exports.user = function(req,res){
 				console.log(results);
 				res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
 				res.render("profile",{
-					username:results[0].username,
-					userid:results[0].id
+					uname1:results[0].username,
+					userid1:results[0]._id
 				});
 			}
 			else{
@@ -32,13 +32,24 @@ exports.tweetcount = function(req,res){
 	var uname = req.param("username");
 	//var tweetcq = "select * from tweets left join users on tweets.user_id = users.id where user_id = "+ userid;
 
-	Users.findOne({username:uname},function(err,results){
+	Users.findOne({username:uname},function(err,result){
 		if(err){
+			console.log(err);
 			res.send(requestGen.responseGenerator(401,null));
 		}
 		else{
-			console.log(results);
-			res.send(requestGen.responseGenerator(200,results.tweets.length ? results.tweets.length : 0));
+			console.log("tweet count");
+			//console.log(result.tweets);
+			var tweets = [];
+			result.tweets.forEach(function(tweet){
+				tweets.push({
+					"first":result.first,
+					"last":result.last,
+					"username":result.username,
+					"createdAt":tweet.createdAt,
+					"tweetdata":tweet});
+			});
+			res.send(requestGen.responseGenerator(200,tweets));
 		}
 	});
 
@@ -58,7 +69,7 @@ exports.followingcount = function(req,res){
 				res.send(requestGen.responseGenerator(401,null));
 			}
 			else{
-				console.log("following count doc : " + results);
+				//console.log("following count doc : " + results.following);
 				res.send(requestGen.responseGenerator(200,results.following));
 			}
 		});
@@ -76,7 +87,7 @@ exports.followercount = function(req,res){
 				res.send(requestGen.responseGenerator(401,null));
 			}
 			else{
-				console.log(results.followers);
+				//console.log(results.followers);
 				res.send(requestGen.responseGenerator(200,results.followers));
 			}
 		});
@@ -86,13 +97,22 @@ exports.usertweets = function(req,res){
 	var uname = req.param("username");
 	//var query = "select * from tweets where user_id =" + userid1;
 
-	Users.findOne({username:uname},function(err,results){
+	Users.findOne({username:uname},function(err,result){
 		if(err){
 			res.send(requestGen.responseGenerator(401,null));
 		}
 		else{
-			console.log(results);
-			res.send(requestGen.responseGenerator(200,results.tweets));
+			//console.log(results);
+			var tweets = [];
+			result.tweets.forEach(function(tweet){
+				tweets.push({
+					"first":user.first,
+					"last":user.last,
+					"username":user.username,
+					"createdAt":tweet.createdAt,
+					"tweetdata":tweet});
+			});
+			res.send(requestGen.responseGenerator(200,tweets));
 		}
 	});
 };

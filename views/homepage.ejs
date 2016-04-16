@@ -28,6 +28,7 @@
 	<script type="text/javascript">
 		x = '<%= userid %>';
 		uname = '<%= username %>';
+		uname3 = '<%= username %>';
  	</script>
 <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -45,7 +46,7 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+        <li class="active"><a href="/home">Home <span class="sr-only">(current)</span></a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
       	<li>
@@ -64,7 +65,7 @@
   </div><!-- /.container-fluid -->
 </nav>
 
-	<div class="col-md-3" ng-init="getuser(uname1); tweetCount(uname1); followingCount(uname1); followerCount(uname1);">
+	<div class="col-md-3" ng-init="getuser(uname1); tweetCount(uname1); followingCount(uname1); followerCount(uname1); updateFeed();">
 
 		<div class="twPc-div">
     		<a class="twPc-bg twPc-block"></a>
@@ -131,7 +132,7 @@
 					</div>
 					<p style="font: 15px; margin-top:10px;"> <span ng-bind-html="toTrustedHTML(tweet.tweetdata.body)"> </span></p>
 					<!-- <div ng-show="uname1==tweet.username && !tweet.tweetdata.isRetweet">
-						<i class="fa fa-retweet" ng-style="uname1 == tweet.username && {'color':'gray'}" data-toggle="modal" ng-style="" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i><span ng-hide="tweet.tweetdata.retweetCount==0">{{tweet.tweetdata.retweetCount}}</span> 
+						<i class="fa fa-retweet" ng-style="uname1 == tweet.username && {'color':'gray'}" data-toggle="modal" ng-style="" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i><span ng-hide="tweet.tweetdata.retweetCount==0">{{tweet.tweetdata.retweetCount}}</span>
 					</div> ng-show="tweet.tweetdata.isRetweet"-->
 					<div>
 						<i class="fa fa-retweet" ng-style="tweet.tweetdata.isRetweet && {'color':'blue'} || uname1 == tweet.username && {'color':'gray'}" data-toggle="modal" ng-style="" data-target="#retweet" ng-attr-data-content="{{tweet}}"></i><span ng-hide="tweet.tweetdata.retweetCount==0">{{tweet.tweetdata.retweetCount}}</span>
@@ -146,9 +147,13 @@
 			<div style="border: 1px solid rgba(180, 173, 173, 0.56); padding: 5px;" ng-repeat="ruser in allusers">
 
 				 <a href="/user?username={{ruser.username}}">{{ruser.first + " " + ruser.last}} <small>@{{ruser.username}} </small></a><br>
-				 <i  class="fa fa-plus" ng-click="follow(ruser.username);">  Follow </i>
+				 <button style="border: 1px solid rgba(180, 173, 173, 0.56);" type="button" id="followButton" name="followbutton" ng-click="follow(ruser.username);">
+					 <i class="fa fa-plus" > </i>
+					 Follow
+				 </button>
 			</div>
 	</div>
+
 	<div class= "modal fade" id="retweet" tabindex="-1" role="dialog" aria-labelledby="Retweet">
 	  	<div class="modal-dialog modal-sm" >
 		 	<div class="modal-content">
@@ -158,7 +163,14 @@
 				<div class="modal-body tweetStyle" ng-init="retweet_undo=true; retweetSuccess=false;">
 					@<span  id="tweetusername"></span></br>
 					<span  id="tweetc"></span>
-					<input ng-model="retweet_id1" id="retweetid1" ng-hide="true"></input><br>
+					<input ng-model="retweet_id1" id="retweetid1" ng-hide="true">
+						<p style="font: 15px; margin-top:10px;">
+							hey
+							<span ng-bind-html="toTrustedHTML(retweetid1)"> </span>
+						</p>
+					</input>
+					<br>
+					<span ng-model="selfRetweet"></span>
 					<span ng-hide="retweet_undo">Retweet Undo!</span>
 					</br>
 					<i class="fa fa-retweet" ng-style="retweetSuccess && {'color':'blue'}" id="retweet_button" ng-click="retweet()" ></i><span id="recount"></span>
@@ -214,9 +226,9 @@
 		</div>
 	 </div>
   </div>
-</disv>
+</div>
 
-<div class="modal fade bs-example-modal-sm1" tabindex="-1" role="dialog" aria-labelledby="Follwers">
+<div class="modal fade bs-example-modal-sm1" tabindex="-1" role="dialog" aria-labelledby="Followers">
   <div class="modal-dialog modal-sm">
 	 <div class="modal-content">
 		<div class="modal-header">
@@ -225,7 +237,6 @@
 		<div ng-model="followers" >
 		  <div class="" style="margin-left: 5px; padding: 5px; border-top: 1px solid rgba(180, 173, 173, 0.56); border-bottom: 1px solid rgba(180, 173, 173, 0.56)" ng-repeat="follower in followers">
 			 {{follower.first + " " + follower.last}} : @{{follower.username}}
-
 		  </div>
 		</div>
 	 </div>
@@ -239,10 +250,11 @@
 		  var tweetcontent = button.data('content') // Extract info from data-* attributes
 		  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
 		  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+			console.log("tweetcontent");
 		  console.log(tweetcontent);
 		  var modal = $(this)
 		  modal.find('#tweetusername').text(tweetcontent.username)
-		  modal.find('#tweetc').text(tweetcontent.content)
+		  modal.find('#tweetc').text(tweetcontent.tweetdata.body)
 		  modal.find('#retweetid1').val(tweetcontent.tweetdata._id)
 		})
 </script>

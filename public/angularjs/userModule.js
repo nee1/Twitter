@@ -2,11 +2,12 @@ var user = angular.module('userModule',[]);
 user.controller('userController',['$scope','$http','$sce', function($scope,$http,$sce){
 	$scope.user_id = window.x;
 	$scope.uname1 = window.uname;
-	var user_id = window.x;
-	var uname1 = window.uname;
+	$scope.uname3 = window.uname3;
+	//var user_id = window.x;
+	//var uname1 = window.uname;
 
 	console.log("in user controller");
-	console.log(user_id);
+	//console.log(user_id);
 
 	$scope.user = null;
 	$scope.user1 = null;
@@ -35,7 +36,7 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 		if (response.status === 200) {
 			$scope.allusers = response.data.slice(0,5);
 			console.log("success at rusers" + $scope.allusers);
-			$scope.updateFeed();
+			//$scope.updateFeed();
 		}
 	});
 
@@ -149,15 +150,19 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 				"tweet_id" : $scope.retweet_id1
 			}
 		}).success(function(response){
-			if(response.data === true){
-				$scope.retweet_undo = true;
-				$scope.retweetSuccess = true;
-				//$scope.retweet_again="Already retweeted";
-			}else{
-				$scope.retweet_undo = false;
-				$scope.retweetSuccess = false;
+			if(response.status == 401){
+				$scope.selfRetweet = response.data;
+			} else {
+				if(response.data === true){
+					$scope.retweet_undo = true;
+					$scope.retweetSuccess = true;
+					//$scope.retweet_again="Already retweeted";
+				}else{
+					$scope.retweet_undo = false;
+					$scope.retweetSuccess = false;
+				}
+				$scope.updateFeed();
 			}
-			$scope.updateFeed();
 		});
 	};
 
@@ -188,8 +193,21 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 		}).success(function(response){
 			if(response.status === 200){
 				$scope.tweetCount = response.data.length ? response.data.length : 0;
-				//why
-				$scope.usertweets = response.data;
+
+				//console.log(response.data);
+				for(tweet in response.data)
+				{
+					var temp = response.data[tweet]['tweetdata']['body'].match(/#\w+/g);
+
+					for(t in temp){
+						response.data[tweet]['tweetdata']['body'] = response.data[tweet]['tweetdata']['body'].replace(temp[t], "<a href='/hashtag?keyword="+temp[t].substr(1)+"'>"+temp[t]+"</a>");
+					}
+
+				}
+				//console.log(response.data);
+				$scope.usrtweets = response.data;
+
+//				$scope.usertweets = response.data;
 			}
 		});
 	};
