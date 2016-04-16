@@ -15,7 +15,7 @@ exports.list = function(req, res){
 exports.getuser = function(req,res){
 	var username1 = req.param("username");
 
-	Users.findOne( {username:username1} ,function(err,results)
+	Users.findOne({username:username1} ,function(err,results)
 	{
 		if(err)
 		{

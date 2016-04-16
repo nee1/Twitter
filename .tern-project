@@ -1,1 +1,4 @@
-{"libs":["ecma5"],"plugins":{"node":{}},"ide":{}}
+{
+  "ecmaVersion": 6,
+  "libs": []
+}
