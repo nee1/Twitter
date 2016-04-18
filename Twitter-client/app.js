@@ -1,8 +1,8 @@
 var express = require('express')
   , routes = require('./routes')
-  , user = require('./routes/user')
   , http = require('http')
   , path = require('path')
+  , user = require('./routes/user')
   , login = require('./routes/login')
   , profile = require('./routes/profile')
   //Importing the 'client-sessions' module
@@ -69,10 +69,10 @@ app.get('/user/followers/count',profile.followercount);
 app.get('/tweet/getfeed', user.getweets);
 app.post('/tweet/post',user.postweet);
 app.post('/tweet/retweet',user.retweet);
-
+app.get('/hashtag',user.hashtag);
 
 app.get('/user',profile.user);
-app.get('/hashtag',user.hashtag);
+
 //app.get('/user/:username',profile.prof);
 //app.get('/signup',signup);
 

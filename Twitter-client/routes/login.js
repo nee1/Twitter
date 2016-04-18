@@ -24,9 +24,10 @@ exports.checkLogin = function(req,res)
 		}
 		else
 		{
-			console.log("users :"+users);
+			//JSON.parse(  ));
+			console.log("users :"+JSON.parse( users ));
 			req.session.username = username1;
-			res.send(users);
+			res.send(JSON.parse( users ));
 		}
 	});
 	//var json_responses;
@@ -43,7 +44,7 @@ exports.redirectToHomepage = function(req,res)
 		res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
 		res.render("homepage",{
 			username:req.session.username,
-			userid:JSON.stringify(req.session.userid)
+			userid:req.session.userid
 		});
 	}
 	else
@@ -77,11 +78,12 @@ exports.checkSignUp = function(req,res){
 	mq.make_request('login_queue', msg_payload, function(err, users){
 		if(err){
 			console.log(err);
-			throw err;
+			//throw err;
 		}
 		else
 		{
 			req.session.username = username1;
-			res.send(resGen.responseGenerator(200));
+			res.send(JSON.parse( users ));
 		}
-};
+	})
+}

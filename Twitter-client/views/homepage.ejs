@@ -116,7 +116,7 @@
 
 		<div style= "" ng-model="tweets">
 
-
+			<span>{{hashresults}}</span>
 			<div class="" ng-repeat="tweet in tweets">
 				<div class="tweetStyle">
 					<div ng-show="tweet.tweetdata.isRetweet">
@@ -165,14 +165,11 @@
 					<span  id="tweetc"></span>
 					<input ng-model="retweet_id1" id="retweetid1" ng-hide="true">
 						<p style="font: 15px; margin-top:10px;">
-							hey
 							<span ng-bind-html="toTrustedHTML(retweetid1)"> </span>
 						</p>
 					</input>
-					<br>
 					<span ng-model="selfRetweet"></span>
-					<span ng-hide="retweet_undo">Retweet Undo!</span>
-					</br>
+					<span ng-hide="retweet_undo">Retweet Undo!</br/></span>
 					<i class="fa fa-retweet" ng-style="retweetSuccess && {'color':'blue'}" id="retweet_button" ng-click="retweet()" ></i><span id="recount"></span>
 				</div>
 		 	</div>
@@ -253,9 +250,9 @@
 			console.log("tweetcontent");
 		  console.log(tweetcontent);
 		  var modal = $(this)
-		  modal.find('#tweetusername').text(tweetcontent.username)
-		  modal.find('#tweetc').text(tweetcontent.tweetdata.body)
-		  modal.find('#retweetid1').val(tweetcontent.tweetdata._id)
+		  modal.find('#tweetusername').text(tweetcontent.username);
+		  modal.find('#tweetc').text(tweetcontent.tweetdata.tw);
+		  modal.find('#retweetid1').val(tweetcontent.tweetdata._id);
 		})
 </script>
 

@@ -9,29 +9,23 @@ var Users = require('./models/userModel');
 var Hashtags = require('./models/hashtagModel');
 
 exports.list = function(req, res){
-  res.send("respond with a resource");
+  res(null,"respond with a resource");
 };
 
 exports.getuser = function(req,res){
-	var username1 = req.param("username");
+	var username1 = req.username;
 
-	Users.findOne({username:username1} ,function(err,results)
+	Users.findOne({username:username1},{first:1,last:1,username:1,location:1,birthdate:1} ,function(err,results)
 	{
 		if(err)
 		{
-			res.send(resGen.responseGenerator(401, null));
+			res(null,JSON.stringify(resGen.responseGenerator(401, null)));
 			throw err;
 		}
 		else
 		{
-			if(results){
 				console.log("valid user found");
-				res.send(resGen.responseGenerator(200, results));
-			}
-			else
-			{
-				res.send(resGen.responseGenerator(401, null));
-			}
+				res(null,JSON.stringify(results));
 		}
 	});
 };
@@ -40,7 +34,7 @@ exports.allusers = function(req,res){
 
 	var getUsers="select * from users";
 
-	Users.find({},function(err,results){
+	Users.find({},{first:1,last:1,username:1},function(err,results){
 		if(err)
 		{
 			throw err;
@@ -50,57 +44,60 @@ exports.allusers = function(req,res){
 			if(results.length > 0){
 				console.log("all users found");
 				//console.log(results[1]);
-				res.send(resGen.responseGenerator(200, results));
+				res(null,JSON.stringify(resGen.responseGenerator(200, results)));
 			}
 			else
 			{
-				res.send(resGen.responseGenerator(401, null));
+				res(null,JSON.stringify(resGen.responseGenerator(401, null)));
 			}
 		}
 	});
 };
 
 exports.hashtag = function(req,res){
-	var keyword = req.param("keyword");
+	var keyword = req.keyword;
 	var tweets = [];
-	Users.find({ "tweets.tags" : new RegExp('.*'+keyword+'.*',"i")},function(err,results){
-		if(err)
-		{
-			console.log("hashtag error : " + err);
-			res.send(resGen.responseGenerator(401,null));
-		}
-		else
-		{
-			//console.log("hashtag results : " + results);
-			results.forEach(function(user){
-				user.tweets.forEach(function(tweet){
-					if(tweet.tags.toString().indexOf(keyword)>=0){
-						tweets.push({
-								"first":user.first,
-								"last":user.last,
-								"username":user.username,
-                "createdAt":tweet.createdAt,
-								"tweetdata":tweet});
-						//console.log(tweet.tags);
-					}
-					//console.log(tweet);
-				});
-			});
-			//console.log(tweets);
-			res.send(resGen.responseGenerator(200,tweets));
-		}
+	Users.find(
+    { "tweets.tags" : new RegExp('.*'+keyword+'.*',"i")},
+    {following:0,followers:0,password:0,email:0,updatedAt:0,createdAt:0},
+    function(err,results){
+  		if(err)
+  		{
+  			console.log("hashtag error : " + err);
+  			res(null,JSON.stringify(resGen.responseGenerator(401,null)));
+  		}
+  		else
+  		{
+  			console.log("hashtag results : " + results);
+  			results.forEach(function(user){
+  				user.tweets.forEach(function(tweet){
+  					if(tweet.tags.toString().indexOf(keyword)>=0){
+  						tweets.push({
+  								"first":user.first,
+  								"last":user.last,
+  								"username":user.username,
+                  "createdAt":tweet.createdAt,
+  								"tweetdata":tweet});
+  						//console.log(tweet.tags);
+  					}
+  					//console.log(tweet);
+  				});
+  			});
+  			//console.log(tweets);
+  			res(null,JSON.stringify(resGen.responseGenerator(200,tweets)));
+  		}
 	});
 };
 
 exports.searchUser =function(req, res){
-	var keyword = req.param("searchkey");
+	var keyword = req.searchkey;
   var userSearchData = [];
 	//var searchquery = "select * from users where (username LIKE '%"+ searchkey +"%' or first_name like '%"+searchkey+"%' or last_name like '%"+searchkey+"%');";
 	Users.find({$or: [
 				{first: new RegExp('.*'+keyword+'.*', "i")},
 				{last : new RegExp('.*'+keyword+'.*',"i")},
 				{username: new RegExp('.*'+keyword+'.*',"i")},
-	]},
+	]},{username:1,first:1,last:1},
 	function(err,results){
 		if(err){
 			throw err;
@@ -120,10 +117,10 @@ exports.searchUser =function(req, res){
       console.log(userSearchData);
 
       if(userSearchData){
-        res.send(resGen.responseGenerator(201,userSearchData));
+        res(null,JSON.stringify(resGen.responseGenerator(201,userSearchData)));
       }
       else{
-        res.send(resGen.responseGenerator(202,null));
+        res(null,JSON.stringify(resGen.responseGenerator(202,null)));
       }
 		}
 	});
@@ -131,18 +128,16 @@ exports.searchUser =function(req, res){
 
 exports.searchTag = function(req,res){
 
-  var keyword = req.param("searchkey");
+  var keyword = req.searchkey;
   console.log("in tag search for" + keyword);
-  Hashtags.find({tags: new RegExp('.*'+keyword+'.*',"i")})
-    //.populate('tweet')
-    .exec(function(err,results){
+  Hashtags.find({tags: new RegExp('.*'+keyword+'.*',"i")},function(err,results){
       if(err){
         console.log("err in hashtag result");
         console.log(err);
       }
       else {
-        console.log("results in hashtag");
-        //console.log(results);
+        console.log("results in hashtag for : "+keyword+" :");
+        console.log(results);
         var doc = [];
         results.forEach(function(res){
           if(doc.indexOf(res.tags) == -1){
@@ -151,7 +146,7 @@ exports.searchTag = function(req,res){
         });
         console.log("logged all tags");
         //console.log(doc);
-        res.send(resGen.responseGenerator(200,doc));
+        res(null,JSON.stringify(resGen.responseGenerator(200,doc)));
         //tweetSearchData = results;
       }
     });
@@ -159,8 +154,8 @@ exports.searchTag = function(req,res){
 
 exports.postweet = function(req,res){
 	var tweetquery;
-	var username1 = req.session.username;
-	var tweetbody = req.param("tweetbody");
+	var username1 = req.username;
+	var tweetbody = req.tweetbody;
 	var temp = {};
 	temp.body = tweetbody;
 	temp.tags = tweetbody.match(/#\w+/g);
@@ -170,10 +165,10 @@ exports.postweet = function(req,res){
 	//console.log(temp);
 	//tweetquery = "insert into tweets (`user_id`,`content`) values ('" + username + "','" + tweet + "')";
 
-	Users.findOne({username:username1}, function(err,user){
+	Users.findOne({username:username1},function(err,user){
 		if(err){
       console.log(err);
-			res.send(resGen.responseGenerator(401,null));
+			res(null,JSON.stringify(resGen.responseGenerator(401,null)));
 		}
 		else
 		{
@@ -182,7 +177,7 @@ exports.postweet = function(req,res){
 				if(err){
           console.log("user save err");
           console.log(err);
-          res.send(resGen.responseGenerator(401,null));
+          res(null,JSON.stringify(resGen.responseGenerator(401,null)));
 				}
 				else
 				{
@@ -223,13 +218,13 @@ exports.postweet = function(req,res){
               if(err){
                 console.log("htag save error");
                 console.log(err);
-                //res.send(resGen.responseGenerator(401,null));
+                //res(null,JSON.stringify(resGen.responseGenerator(401,null));
               }
             });
           }
           console.log("tags stored like this");
           //console.log(htag);
-					res.send(resGen.responseGenerator(200,temp));
+					res(null,JSON.stringify(resGen.responseGenerator(200,temp)));
 				}
 			});
     }
@@ -238,8 +233,8 @@ exports.postweet = function(req,res){
 
 exports.retweet = function(req,res){
 
-	var username1 = req.session.username;
-	var tweetid = req.param("tweet_id");
+	var username1 = req.username;
+	var tweetid = req.tweet_id;
 	//console.log("tweetid for retweet : " + tweetid );
 	//var tweetquery = "insert into retweets (`user_id`,`tweet_id`) values ('" + userid + "','" + tweetid + "')";
 	var tempTweet = [], retweetSuccess = false,i;
@@ -249,22 +244,22 @@ exports.retweet = function(req,res){
 	//temp["tags"] = tweet.match(/#\w+/g).toString();
 	//temp["isRetweet"] = false;
 
-	Users.findOne({'tweets._id' : tweetid }, function(err,tuser){
+	Users.findOne({'tweets._id' : tweetid },function(err,tuser){
 		if(err){
 			console.log("tweetid :" + tweetid +" not found");
-			res.send(resGen.responseGenerator(401,null));
+			res(null,JSON.stringify(resGen.responseGenerator(401,null)));
 		}
 		else{
 			//console.log("user for retweet : "+ user);
 
 			//console.log("for retweet"+tempTweet);
       if(tuser.username == username1){
-        res.send(resGen.responseGenerator(401,"Can't retweet your own tweets"));
+        res(null,JSON.stringify(resGen.responseGenerator(401,"Can't retweet your own tweets")));
       }
       else {
         Users.findOne({'username':username1},function(err,ruser){
           if(err){
-              res.send(resGen.responseGenerator(401,null));
+              res(null,JSON.stringify(resGen.responseGenerator(401,null)));
           }
           else{
             //console.log("in user for retweet");
@@ -325,20 +320,20 @@ exports.retweet = function(req,res){
             tuser.save(function(err,data){
               if(err){
                 console.log(err);
-                res.send(resGen.responseGenerator(401,null));
+                res(null,JSON.stringify(resGen.responseGenerator(401,null)));
               }
             });
 
             ruser.save(function(err,data){
               if(err){
                 console.log(err);
-                res.send(resGen.responseGenerator(401,null));
+                res(null,JSON.stringify(resGen.responseGenerator(401,null)));
               }
               else
               {
                 //var doc = {'data':data, 'undoRetweet':retweetSuccess};
                 //console.log("retweet save log: "+ doc);
-                res.send(resGen.responseGenerator(200,retweetSuccess));
+                res(null,JSON.stringify(resGen.responseGenerator(200,retweetSuccess)));
               }
             });
           }
@@ -350,17 +345,17 @@ exports.retweet = function(req,res){
 
 
 exports.getweets = function(req,res){
-	var username1 = req.session.username;
-	//var userid = req.session.userid;
+	var username1 = req.username;
+	//var userid = req.userid;
 
 	//var tweetsquery = "select * from tweets left join users on tweets.user_id = users.id where tweets.user_id in ( select follow_uname from following where following.user_uname= " + userid + ");";
 	var followingData = [], tweets = [];
 
-	Users.findOne({username:username1},function(err,results){
+	Users.findOne({username:username1}, {following:1,username:1,_id:1}, function(err,results){
 		if(err)
 		{
 			console.log("getweets err : " + err);
-			res.send(resGen.responseGenerator(401,null));
+			res(null,JSON.stringify(resGen.responseGenerator(401,null)));
 		}
 		else
 		{
@@ -372,10 +367,10 @@ exports.getweets = function(req,res){
 			}
 
 			//console.log("following data in getweets: " + followingData);
-			Users.find({_id:{$in : followingData}}, function(err,followings){
+			Users.find({_id:{$in : followingData}}, {username:1,first:1,last:1,tweets:1}, function(err,followings){
 				if(err)
 				{
-					res.send(resGen.responseGenerator(401,null));
+					res(null,JSON.stringify(resGen.responseGenerator(401,null)));
 				}
 				else
 				{
@@ -391,7 +386,7 @@ exports.getweets = function(req,res){
 						//tweets.push("tweets":user.tweets);
 					});
 					//console.log(tweets);
-					res.send(resGen.responseGenerator(200,tweets));
+					res(null,JSON.stringify(resGen.responseGenerator(200,tweets)));
 				}
 			});
 		}
@@ -400,27 +395,27 @@ exports.getweets = function(req,res){
 
 
 exports.follow = function(req,res){
-	var username1 = req.session.username;
-	var follow_uname = req.param("follow_uname");
+	var username1 = req.username;
+	var follow_uname = req.follow_uname;
 	//var followquery = "insert into following (`user_uname`,`follow_uname`) values ('" + userid + "','" + followid + "')";
   console.log(username1);
   console.log(follow_uname);
   if(username1 == follow_uname){
     console.log("same user");
-    res.send(resGen.responseGenerator(400,null));
+    res(null,JSON.stringify(resGen.responseGenerator(400,null)));
   }
   else{
     Users.findOne({username:username1},function(err, user){
       if(err)
       {
-        res.send(resGen.responseGenerator(401,null));
+        res(null,JSON.stringify(resGen.responseGenerator(401,null)));
       }
       else
       {
         Users.findOne({username:follow_uname},function(err, follower){
           if(err)
           {
-            res.send(resGen.responseGenerator(401,null));
+            res(null,JSON.stringify(resGen.responseGenerator(401,null)));
           }
           else
           {
@@ -433,7 +428,7 @@ exports.follow = function(req,res){
               }
               user.save(function(err,res1){
                   if(err){
-                    res.send(resGen.responseGenerator(401,null));
+                    res(null,JSON.stringify(resGen.responseGenerator(401,null)));
                   }
               });
             }
@@ -445,12 +440,12 @@ exports.follow = function(req,res){
               }
               follower.save(function(err,res2){
                   if(err){
-                    res.send(resGen.responseGenerator(401,null));
+                    res(null,JSON.stringify(resGen.responseGenerator(401,null)));
                   }
               });
             }
             console.log("follow follower success");
-            res.send(resGen.responseGenerator(200,follow_uname));
+            res(null,JSON.stringify(resGen.responseGenerator(200,follow_uname)));
           }
         });
       }

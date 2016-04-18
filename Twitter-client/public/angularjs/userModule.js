@@ -3,9 +3,12 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 	$scope.user_id = window.x;
 	$scope.uname1 = window.uname;
 	$scope.uname3 = window.uname3;
+	$scope.hashTweets3 = window.hashTweets2;
+	$scope.hashresults = "";
 	//var user_id = window.x;
 	//var uname1 = window.uname;
-
+console.log($scope.hashTweets3);
+console.log(window.hashTweets2);
 	console.log("in user controller");
 	//console.log(user_id);
 
@@ -86,6 +89,24 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 		}
 	};
 
+	$scope.gethashtag = function(hkeyy){
+		var hkeyy1 = hkeyy;
+		$http({
+			method : "GET",
+			url : '/hashtag',
+			params : {
+				"username" : hkeyy1
+			}
+		}).success(function(response){
+			if (response.status === 200) {
+				//console.log("success on getuser" + response.data);
+				//$scope.userInfo = response.data;
+				$scope.hashresults = "Tweets with #"+hashkey+":";
+				$scope.tweets = response.data;
+			}
+		});
+	};
+
 
 	$scope.updateFeed = function(){
 		$http.get('/tweet/getfeed').success(function(response){
@@ -94,7 +115,8 @@ user.controller('userController',['$scope','$http','$sce', function($scope,$http
 				for(var tweet in response.data){
 						var temp = response.data[tweet].tweetdata.body.match(/#\w+/g);
 						for(var t in temp){
-								response.data[tweet].tweetdata.body = response.data[tweet].tweetdata.body.replace(temp[t], "<a href='/hashtag?keyword="+temp[t].substr(1)+"'>"+temp[t]+"</a>");
+								response.data[tweet].tweetdata.tw = response.data[tweet].tweetdata.body;
+								response.data[tweet].tweetdata.body = response.data[tweet].tweetdata.body.replace(temp[t], "<a ng-click=gethashtag("+temp[t].substr(1)+")>"+temp[t]+"</a>");
 						}
 				}
 

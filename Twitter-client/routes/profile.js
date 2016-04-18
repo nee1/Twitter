@@ -1,30 +1,26 @@
 var ejs = require("ejs");
-var mysql = require('./mysql');
 var resGen = require('./commons/responseGenerator');
-var Users = require('./models/userModel');
 var mq = require('../rpc/client');
 
 
 exports.user = function(req,res){
 	var username1 = req.param("username");
 	//var userquery = "select * from users where id = "+userid;
-	var msg_payload = {"service":"user", "username":username1, "sid":req.sessionID};
+	var msg_payload = {"service":"getuser", "username":username1, "sid":req.sessionID};
 	mq.make_request('user_queue', msg_payload, function(err,results){
 		if(err){
 			console.log(err);
 			//throw err;
 		}
 		else{
-			if(results.length === 1){
-				console.log(results);
-				res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-				res.render("profile",{
-					uname1:results[0].username,
-					userid1:results[0]._id
-				});
-			}	else {
-				resGen.responseGenerator(401,null);
-			}
+			results = JSON.parse( results );
+			console.log("profile user success");
+			console.log(results);
+			res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+			res.render("profile",{
+				uname1:results.username,
+				userid1:results._id
+			});
 		}
 	});
 };
@@ -40,7 +36,8 @@ exports.tweetcount = function(req,res){
 			res.send(resGen.responseGenerator(401,null));
 		}
 		else{
-			res.send(resGen.responseGenerator(200,results));
+			results = JSON.parse( results );
+			res.send(results);
 		}
 	});
 
@@ -59,8 +56,9 @@ exports.followingcount = function(req,res){
 				res.send(resGen.responseGenerator(401,null));
 			}
 			else{
+				following = JSON.parse( following );
 				//console.log("following count doc : " + results.following);
-				res.send(resGen.responseGenerator(200,following));
+				res.send(following);
 			}
 		});
 };
@@ -76,8 +74,10 @@ exports.followercount = function(req,res){
 			res.send(resGen.responseGenerator(401,null));
 		}
 		else{
-			//console.log(results.followers);
-			res.send(resGen.responseGenerator(200,followers));
+			followers  = JSON.parse(followers);
+			//console.log("followers");
+			//console.log(followers);
+			res.send(followers);
 		}
 	});
 };
@@ -86,13 +86,14 @@ exports.usertweets = function(req,res){
 	var uname = req.param("username");
 	//var query = "select * from tweets where user_id =" + userid1;
 	var msg_payload = {"service":"usertweets", "username":uname, "sid":req.sessionID};
-	mq.make_request('count_queue', msg_payload, function(err,tweets){
+	mq.make_request('tweet_queue', msg_payload, function(err,tweets){
 		if(err){
 			console.log(err);
 			res.send(resGen.responseGenerator(401,null));
 		}
 		else{
-			res.send(resGen.responseGenerator(200,tweets));
+			tweets = JSON.parse( tweets );
+			res.send(tweets);
 		}
 	});
 };

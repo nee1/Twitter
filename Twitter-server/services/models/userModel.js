@@ -77,6 +77,7 @@ var userSchema = new Schema({
     },
     last: {
     	type: String,
+      default: "",
         required: false
     },
     email: {

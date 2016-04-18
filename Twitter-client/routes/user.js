@@ -7,8 +7,6 @@ var mq = require('../rpc/client');
 
 //var mysql = require('./mysql');
 var resGen = require('./commons/responseGenerator');
-var Users = require('./models/userModel');
-var Hashtags = require('./models/hashtagModel');
 
 exports.list = function(req, res){
   res.send("respond with a resource");
@@ -18,7 +16,6 @@ exports.getuser = function(req,res){
 	var username1 = req.param("username");
   var msg_payload = {"service":"getuser", "username":username1, "sid":req.sessionID};
   mq.make_request('user_queue', msg_payload, function(err,results){
-	{
 		if(err)
 		{
       console.log(err);
@@ -26,8 +23,10 @@ exports.getuser = function(req,res){
 		}
 		else
 		{
+
 			if(results){
-				res.send(resGen.responseGenerator(200, results));
+        results = JSON.parse( results );
+				res.send(resGen.responseGenerator(200,results));
 			}
 			else
 			{
@@ -49,9 +48,10 @@ exports.allusers = function(req,res){
 		else
 		{
 			if(results.length > 0){
+        results = JSON.parse( results );
 				console.log("all users found");
 				//console.log(results[1]);
-				res.send(resGen.responseGenerator(200, results));
+				res.send(results);
 			}
 			else
 			{
@@ -62,8 +62,8 @@ exports.allusers = function(req,res){
 };
 
 exports.hashtag = function(req,res){
-	var keyword = req.param("keyword");
-	var msg_payload = {"service":"hashtag", "keyword":keyword, "sid":req.sessionID};
+	var keyword1 = req.param("keyword");
+	var msg_payload = {"service":"hashtag", "keyword":keyword1, "sid":req.sessionID};
 	mq.make_request('search_queue', msg_payload, function(err,tweets){
 		if(err)
 		{
@@ -72,7 +72,8 @@ exports.hashtag = function(req,res){
 		}
 		else
 		{
-			res.send(resGen.responseGenerator(200,tweets));
+      tweets = JSON.parse( tweets );
+      res.send(tweets);
 		}
 	});
 };
@@ -86,7 +87,8 @@ exports.searchUser =function(req, res){
 		}
 		else{
       if(userSearchData){
-        res.send(resGen.responseGenerator(201,userSearchData));
+        userSearchData = JSON.parse( userSearchData );
+        res.send(userSearchData);
       }
       else{
         res.send(resGen.responseGenerator(202,null));
@@ -98,16 +100,17 @@ exports.searchUser =function(req, res){
 exports.searchTag = function(req,res){
   var keyword = req.param("searchkey");
   var msg_payload = {"service":"searchTag", "searchkey":keyword, "sid":req.sessionID};
-  mq.make_request('count_queue', msg_payload, function(err,searchTagData){
-      if(err){
-        console.log("err in hashtag result");
-        console.log(err);
-        res.send(resGen.responseGenerator(401,null));
-      }
-      else {
-        res.send(resGen.responseGenerator(200,searchTagData));
-      }
-    });
+  mq.make_request('search_queue', msg_payload, function(err,searchTagData){
+    if(err){
+      console.log("err in hashtag result");
+      console.log(err);
+      res.send(resGen.responseGenerator(401,null));
+    }
+    else {
+      searchTagData = JSON.parse(searchTagData);
+      res.send(searchTagData);
+    }
+  });
 }
 
 exports.postweet = function(req,res){
@@ -121,7 +124,8 @@ exports.postweet = function(req,res){
 		}
 		else
 		{
-			res.send(resGen.responseGenerator(200,data));
+      data = JSON.parse( data );
+			res.send(data);
 	  }
 	});
 }
@@ -130,14 +134,15 @@ exports.retweet = function(req,res){
 	var username1 = req.session.username;
 	var tweetid = req.param("tweet_id");
 
-  var msg_payload = {"service":"retweet", "username":username1, "tweet_id":tweet_id, "sid":req.sessionID};
+  var msg_payload = {"service":"retweet", "username":username1, "tweet_id":tweetid, "sid":req.sessionID};
   mq.make_request('tweet_queue', msg_payload, function(err,retweetSuccess){
 		if(err){
       console.log(err);
       res.send(resGen.responseGenerator(401,null));
 		}
 		else{
-      res.send(resGen.responseGenerator(200,retweetSuccess));
+      retweetSuccess = JSON.parse( retweetSuccess );
+      res.send(retweetSuccess);
 		}
 	});
 };
@@ -154,7 +159,8 @@ exports.getweets = function(req,res){
 		}
 		else
 		{
-			res.send(resGen.responseGenerator(200,tweets));
+      tweets = JSON.parse( tweets );
+			res.send(tweets);
 		}
 	});
 };
@@ -179,8 +185,9 @@ exports.follow = function(req,res){
       }
       else
       {
+        follow_name = JSON.parse( follow_name );
         console.log("follow follower success");
-        res.send(resGen.responseGenerator(200,follow_name));
+        res.send(follow_name);
       }
     });
   }
