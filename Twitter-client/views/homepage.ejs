@@ -26,7 +26,6 @@
 
 <body ng-app="userModule" ng-controller="userController">
 	<script type="text/javascript">
-		x = '<%= userid %>';
 		uname = '<%= username %>';
 		uname3 = '<%= username %>';
  	</script>
@@ -117,6 +116,7 @@
 		<div style= "" ng-model="tweets">
 
 			<span>{{hashresults}}</span>
+			<span ng-if="tweets.length==0">No tweets available, please follow other users!</span>
 			<div class="" ng-repeat="tweet in tweets">
 				<div class="tweetStyle">
 					<div ng-show="tweet.tweetdata.isRetweet">

@@ -7,7 +7,7 @@ var login = require('./services/login')
   , amqp = require('amqp');
 
 //var routes = require('./services')
-var mongoSessionConnectURL = "mongodb://localhost:27017/twitter";
+var mongoSessionConnectURL = "mongodb://localhost:27017/twitter?poolSize=8";
 var cnn = amqp.createConnection({host:'127.0.0.1'});
 
 

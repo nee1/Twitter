@@ -17,17 +17,26 @@ exports.checkLogin = function(req,res)
 	//"sessionId":req.sessionID console.log(password1 +" is the password");
 
 	var msg_payload = {"service":"checkLogin","username":username1,"password":password1};
-	mq.make_request('login_queue', msg_payload, function(err, users){
+	mq.make_request('login_queue', msg_payload, function(err, valid){
 		if(err){
 			console.log("error at username password" + err);
 			//throw err;
 		}
 		else
 		{
-			//JSON.parse(  ));
-			console.log("users :"+JSON.parse( users ));
-			req.session.username = username1;
-			res.send(JSON.parse( users ));
+			valid = JSON.parse(valid);
+			if(valid.status == 200){
+				console.log("users :"+valid);
+				req.session.username = username1;
+				res.render("homepage",{
+					username:req.session.username
+				});
+				res.send(resGen.responseGenerator(200,valid));
+//				res.send(resGen.responseGenerator(200,valid));
+			}
+			else {
+						res.send(resGen.responseGenerator(401,valid));
+					}
 		}
 	});
 	//var json_responses;
@@ -42,10 +51,8 @@ exports.redirectToHomepage = function(req,res)
 	{
 		//Set these headers to notify the browser not to maintain any cache for the page being loaded
 		res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-		res.render("homepage",{
-			username:req.session.username,
-			userid:req.session.userid
-		});
+		res.render("homepage",{username:req.session.username});
+
 	}
 	else
 	{
@@ -73,7 +80,7 @@ exports.checkSignUp = function(req,res){
 	var location1 = req.param("location");
 
 	console.log("in checkssignup");
-	var msg_payload = {"service":"checkSignUp", "username":username1, "password":password1, "first":first, "last":last1, "email":email1, "birthdate":birthdate1, "location":location1};
+	var msg_payload = {"service":"checkSignUp", "username":username1, "password":password1, "firstname":first1, "lastname":last1, "email":email1, "birthdate":birthdate1, "location":location1};
 
 	mq.make_request('login_queue', msg_payload, function(err, users){
 		if(err){

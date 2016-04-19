@@ -32,7 +32,7 @@ exports.getuser = function(req,res){
 
 exports.allusers = function(req,res){
 
-	var getUsers="select * from users";
+	//var getUsers="select * from users";
 
 	Users.find({},{first:1,last:1,username:1},function(err,results){
 		if(err)
@@ -117,7 +117,7 @@ exports.searchUser =function(req, res){
       console.log(userSearchData);
 
       if(userSearchData){
-        res(null,JSON.stringify(resGen.responseGenerator(201,userSearchData)));
+        res(null,JSON.stringify(resGen.responseGenerator(200,userSearchData)));
       }
       else{
         res(null,JSON.stringify(resGen.responseGenerator(202,null)));

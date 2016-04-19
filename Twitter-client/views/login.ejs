@@ -14,44 +14,50 @@
 <!-- Loading the AngularJS file from /public/angularJS folder -->
 <script src="./angularjs/login.js"></script>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 </script>
 </head>
 <body ng-app="loginModule" ng-controller="loginController">
 
 
 	<div class="backgroundImage">
-     
+
       <div class="buttonContainer">
-      	<p style="float: left; color: rgb(255, 255, 255); font-size: 35px;">Twitter</p>   
+      	<p style="float: left; color: rgb(255, 255, 255); font-size: 35px;">Twitter</p>
       	<a data-toggle="modal" href="#mySignUp" class="Button SignUp">Sign Up</a>
       </div>
-    </div>    
+    </div>
 
-    
+
 	<div class="col-sm-3"></div>
 
-	<div  class="col-sm-6">	
+	<div  class="col-sm-6">
 		<div class="panel" style="background-color: #1da1f2; margin-top: 20px;">
-	        <div class="panel-body">
-	        	<h3 style="margin: 10px; color: rgb(255,255,255);">Login to your account</h3>
-				<div class="col-sm-8" style="margin: 10px">
-				      <input class="inputStyle" type="text" class="form-control" name="Username" ng-model="username" placeholder="Username" required>
+        <div class="panel-body">
+      		<h3 style="margin: 10px; color: rgb(255,255,255);">Login to your account</h3>
+					<form name="userForm" ng-submit="submitLogin(userForm.$valid)" novalidate>
+
+						<div class="col-sm-8 form-group" style="margin: 10px">
+			      	<input class="inputStyle" type="text" class="form-control" name="Username" ng-model="username" placeholder="Username" required>
+							<p ng-show="userForm.username.$invalid && !userForm.username.$pristine" class="help-block">Your username is required.</p>
+						</div>
+						<div class="col-sm-8 form-group" style="margin: 10px">
+						  <input class="inputStyle" type="password" class="form-control" name="Password" ng-model="password" placeholder="Password" required>
+							<p ng-show="userForm.password.$invalid && !userForm.password.$pristine" class="help-block">You password is required.</p>
+
+						</div>
+
+						<div class="col-md-8" style="margin: 10px;">
+							<div ng-hide="invalid_login" class="alert alert-danger ng-hide" >
+								<strong class="help-block">Incorrect username or password</strong>
+							</div>
+							<div ng-hide="unexpected_error" class="alert alert-danger ng-hide" >
+								<strong class="help-block">Unexpected error, try again</strong>
+							</div>
+							<input class="buttonStyle" type="submit" ng-disabled="userForm.$invalid" class="btn primary-btn" ng-click="" value="Login" />
+						</div>
+					</form>
 				</div>
-				<div class="col-sm-8" style="margin: 10px">
-					  <input class="inputStyle" type="password" class="form-control" name="Password" ng-model="password" placeholder="Password" required>
-				</div>
-				
-				<div class="col-md-8" style="margin: 10px;">
-					<div ng-hide="invalid_login" class="alert alert-danger ng-hide" >
-						<strong>Incorrect username or password</strong>
-					</div>
-					<div ng-hide="unexpected_error" class="alert alert-danger ng-hide" >
-						<strong>Unexpected error, try again</strong>
-					</div>
-					<input class="buttonStyle" type="submit" class="btn primary-btn" ng-click="submitLogin();" value="Login" />
-				</div>
-	        </div>
 		</div>
 	</div>
 
@@ -64,41 +70,28 @@
       </div>
       <div class="modal-body">
         <div class="row">
-       	<form name="myForm">
+       	<form name="myForm" ng-submit="submitSignUp(myForm.$valid)" novalidate>
           <div class="col-sm-8" style="margin: 10px">
-				<input type="text" class="form-control" name="FirstName" ng-model="firstname" placeholder="First Name" required></input>
-				<div role="alert">
-			      <span class="error" ng-show="myForm.FirstName.$error.required">
-			       First Name Required!</span>
-			    </div>
-			</div>
-			<div class="col-sm-8" style="margin: 10px">
-				<input type="text" class="form-control" name="LastName" ng-model="lastname" placeholder="Last Name"></input>
-			</div>
-			<div class="col-sm-8" style="margin: 10px">
-				<input type="email" class="form-control" name="Email" ng-model="email" placeholder="Email" required></input>
-				<div role="alert">
-			      <span class="error" ng-show="myForm.Email.$error.required">
-			       Email Required!</span>
-			    </div>
-			</div>
-			<div class="col-sm-8" style="margin: 10px">
-				<input type="text" class="form-control" name="Username" ng-model="username1" placeholder="Username" required></input>
-				<div role="alert">
-			      <span class="error" ng-show="myForm.Username.$error.required">
-			       Username Required!</span>
-			    </div>
+						<input type="text" class="form-control" name="FirstName" ng-model="firstname" placeholder="First Name" required></input>
+						<p ng-show="myForm.FirstName.$invalid && !myForm.FirstName.$pristine" class="help-block">You First name is required.</p>
 
-			</div>
+					</div>
+					<div class="col-sm-8" style="margin: 10px">
+						<input type="text" class="form-control" name="LastName" ng-model="lastname" placeholder="Last Name"></input>
+					</div>
+					<div class="col-sm-8" style="margin: 10px">
+						<input type="email" class="form-control" name="email" ng-model="email" placeholder="Email" required></input>
+						<p ng-show="myForm.email.$invalid && !myForm.email.$pristine" class="help-block">Your email is required.</p>
+					</div>
+					<div class="col-sm-8" style="margin: 10px">
+						<input type="text" class="form-control" name="username1" ng-model="username1" placeholder="Username" required></input>
+						<p ng-show="myForm.username1.$invalid && !myForm.username1.$pristine" class="help-block">Your username is required.</p>
+					</div>
+				<div class="col-sm-8" style="margin: 10px">
+					<input type="password" class="form-control" name="password1" ng-model="password1" placeholder="Password" required></input>
+					<p ng-show="myForm.password1.$invalid && !myForm.password1.$pristine" class="help-block">You password is required.</p>
 
-			<div class="col-sm-8" style="margin: 10px">
-				<input type="password" class="form-control" name="Password" ng-model="password1" placeholder="Password" required></input>
-				<div role="alert">
-			      <span class="error" ng-show="myForm.Passwword.$error.required">
-			       Password Required!</span>
-			    </div>
-
-			</div>
+				</div>
 			<script src="//cdn.jsdelivr.net/webshim/1.14.5/polyfiller.js"></script>
 			<script>
 			    webshims.setOptions('forms-ext', {types: 'date'});
@@ -112,7 +105,7 @@
 			<div class="col-sm-8" style="margin: 10px">
 				<input type="text" class="form-control" name="Location" ng-model="location" placeholder="Your Location"></input>
 			</div>
-			
+
 			<div class="col-sm-8" style="margin: 10px;">
 				<div ng-hide="invalid_signup" class="alert alert-danger ng-hide" >
 					<strong>Incorrect Values</strong>
@@ -120,8 +113,7 @@
 				<div ng-hide="unexpected_err" class="alert alert-danger ng-hide" >
 					<strong>Unexpected error, try again</strong>
 				</div>
-			
-				<input type="submit" class="btn btn-primary" ng-click="submitSignUp();" value="Sign Up" />
+				<input type="submit" class="btn btn-primary" ng-disabled="myForm.$invalid" value="Sign Up" />
 			</div>
         </div>
         </form>

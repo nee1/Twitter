@@ -1,6 +1,5 @@
 var user = angular.module('userModule',[]);
 user.controller('userController',['$scope','$http','$sce', function($scope,$http,$sce){
-	$scope.user_id = window.x;
 	$scope.uname1 = window.uname;
 	$scope.uname3 = window.uname3;
 	$scope.hashTweets3 = window.hashTweets2;
